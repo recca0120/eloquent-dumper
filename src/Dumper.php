@@ -27,7 +27,7 @@ class Dumper
      */
     protected function format($sql)
     {
-        return Formatter::format($sql, ['type' => 'text']);
+        return Formatter::format($sql);
     }
 
     /**
