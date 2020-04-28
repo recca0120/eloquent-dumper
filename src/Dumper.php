@@ -37,7 +37,9 @@ class Dumper
      */
     private function toSql($sql, $wrap)
     {
-        $sql = $wrap ? $sql : preg_replace('/`|"/', '', $sql);
+        $sql = $wrap ? $sql : preg_replace_callback('/[`"\[](?<column>[^`"\[\]]+)[`"\]]/', function ($matches) {
+            return ! empty($matches['column']) ? $matches['column'] : $matches[0];
+        }, $sql);
 
         return str_replace(['%', '?'], ['%%', '%s'], $sql);
     }
@@ -74,18 +76,5 @@ class Dumper
     private function value($binding)
     {
         return sprintf("'%s'", $binding);
-    }
-
-    /**
-     * @param string $sql
-     * @param bool $wrap
-     */
-    private function wrap($sql, $wrap)
-    {
-        if ($wrap === true) {
-            return $sql;
-        }
-
-        return preg_replace('/`|"/', '', $sql);
     }
 }
