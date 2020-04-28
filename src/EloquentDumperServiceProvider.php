@@ -19,9 +19,11 @@ class EloquentDumperServiceProvider extends ServiceProvider
             $runningInConsole = app()->runningInConsole();
             $sql = app(Dumper::class)->rawSql($this, $wrap);
 
-            ! $runningInConsole && method_exists('dump')
-                ? dump($sql)
-                : var_dump($sql);
+            if (! $runningInConsole && method_exists('dump')) {
+                dump($sql);
+            } else {
+                echo "\n".$sql."\n";
+            }
 
             return $this;
         });
