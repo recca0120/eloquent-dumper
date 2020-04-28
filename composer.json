@@ -1,0 +1,45 @@
+{
+    "name": "recca0120/eloquent-dumper",
+    "description": "",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "recca0120",
+            "email": "recca0120@gmail.com"
+        }
+    ],
+    "type": "library",
+    "require": {
+        "illuminate/database": "^7.0",
+        "phpmyadmin/sql-parser": "^5.3"
+    },
+    "require-dev": {
+        "mockery/mockery": "^1.3",
+        "phpunit/phpunit": "^9.1",
+        "symfony/var-dumper": "^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Recca0120\\EloquentDumper\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Recca0120\\EloquentDumper\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Recca0120\\EloquentDumper\\EloquentDumperServiceProvider"
+            ]
+        }
+    }
+}
