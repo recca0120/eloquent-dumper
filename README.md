@@ -1,5 +1,10 @@
 # Eloquent Dumper
 
+## Install
+```bash
+composer require recca0120/eloquent-dumper
+```
+
 ## How to use
 
 ```php
