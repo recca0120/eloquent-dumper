@@ -12,7 +12,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_simple(Builder $query, $expected)
+    public function test_it_should_get_simple_sql(Builder $query, $expected)
     {
         $dumper = $this->givenDumper();
 
@@ -38,7 +38,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_in(Builder $query, $expected)
+    public function test_it_should_get_condition_in_sql(Builder $query, $expected)
     {
         $dumper = $this->givenDumper();
 
@@ -62,7 +62,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_none_driver(Builder $query, $expected)
+    public function test_it_should_convert_to_none_quote_sql(Builder $query, $expected)
     {
         $dumper = $this->givenDumper(Dumper::NONE);
 
@@ -86,7 +86,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_mysql_driver(Builder $query, $expected)
+    public function test_it_should_convert_to_mysql_version_sql(Builder $query, $expected)
     {
         $dumper = $this->givenDumper(Dumper::MYSQL);
 
@@ -110,7 +110,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_sqlite_driver(Builder $query, $expected)
+    public function test_it_should_convert_to_sqlite_version_sql(Builder $query, $expected)
     {
         $dumper = $this->givenDumper(Dumper::SQLITE);
 
@@ -134,7 +134,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_postgres_driver(Builder $query, $expected)
+    public function test_it_should_convert_to_postgres_version_sql(Builder $query, $expected)
     {
         $dumper = $this->givenDumper(Dumper::POSTGRES);
 
@@ -158,7 +158,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_mssql_driver(Builder $query, $expected)
+    public function test_it_should_convert_to_mssql_version_sql(Builder $query, $expected)
     {
         $dumper = $this->givenDumper(Dumper::MSSQL);
 

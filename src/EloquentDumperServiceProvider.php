@@ -2,7 +2,8 @@
 
 namespace Recca0120\EloquentDumper;
 
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,28 +24,47 @@ class EloquentDumperServiceProvider extends ServiceProvider
             return new Dumper($config['driver']);
         });
 
-        Builder::macro('sql', function () {
-            return app(Dumper::class)->sql($this);
-        });
+        $sql = function (QueryBuilder $query) {
+            return app(Dumper::class)->sql($query);
+        };
 
-        Builder::macro('dumpSql', function () {
-            $sql = app(Dumper::class)->sql($this);
+        $dumpSql = function (QueryBuilder $query) use ($sql) {
+            $sql = $sql($query);
             if (app()->runningInConsole()) {
-                echo "\n".$sql."\n";
+                echo "\n" . $sql . "\n";
             } else {
                 dump($sql);
             }
 
             return $this;
+        };
+
+        Builder::macro('sql', function () use ($sql) {
+            return $sql($this->query);
+        });
+        QueryBuilder::macro('sql', function () use ($sql) {
+            return $sql($this);
+        });
+
+        Builder::macro('dumpSql', function () use ($dumpSql) {
+            return $dumpSql($this->query);
+        });
+        QueryBuilder::macro('dumpSql', function () use ($dumpSql) {
+            return $dumpSql($this);
         });
     }
 
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
     public function boot()
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/eloquent-dumper.php' => config_path('eloquent-dumper.php'),
-            ]);
+                __DIR__ . '/../config/eloquent-dumper.php' => config_path('eloquent-dumper.php'),
+            ], 'eloquent-dumper');
         }
     }
 }

@@ -1,5 +1,8 @@
 <?php
 
 return [
-    'driver' => \Recca0120\EloquentDumper\Dumper::DEFAULT,
+    /**
+     * Supported: "default", "mysql", "sqlite", "postgres", "mssql"
+     */
+    'driver' => env('ELOQUENT_DUMPER_DRIVER', 'default'),
 ];

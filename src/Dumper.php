@@ -114,6 +114,18 @@ class Dumper
             return $sql;
         }
 
+        list($left, $right) = $this->getQuote();
+
+        return preg_replace_callback('/[`"\[](?<column>[^`"\[\]]+)[`"\]]/', function ($matches) use ($right, $left) {
+            return !empty($matches['column']) ? $left . $matches['column'] . $right : $matches[0];
+        }, $sql);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getQuote()
+    {
         $quoteLookup = [
             self::NONE => ['', ''],
             self::MYSQL => ['`', '`'],
@@ -122,10 +134,6 @@ class Dumper
             self::MSSQL => ['[', ']'],
         ];
 
-        list($leftQuote, $rightQuote) = $quoteLookup[$this->driver];
-
-        return preg_replace_callback('/[`"\[](?<column>[^`"\[\]]+)[`"\]]/', function ($matches) use ($rightQuote, $leftQuote) {
-            return ! empty($matches['column']) ? $leftQuote.$matches['column'].$rightQuote : $matches[0];
-        }, $sql);
+        return $quoteLookup[$this->driver];
     }
 }
