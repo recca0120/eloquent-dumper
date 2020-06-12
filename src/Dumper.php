@@ -8,15 +8,46 @@ use PhpMyAdmin\SqlParser\Utils\Formatter;
 
 class Dumper
 {
+    const DEFAULT = 'default';
+    const NONE = 'none';
+    const MYSQL = 'mysql';
+    const SQLITE = 'sqlite';
+    const POSTGRES = 'postgres';
+    const MSSQL = 'mssql';
+
+    /**
+     * @var null
+     */
+    private $driver;
+
+    /**
+     * Dumper constructor.
+     * @param string $driver
+     */
+    public function __construct($driver = 'default')
+    {
+        $this->driver = $driver;
+    }
+
+    /**
+     * @param string $driver
+     * @return $this
+     */
+    public function setDriver($driver)
+    {
+        $this->driver = $driver;
+
+        return $this;
+    }
+
     /**
      * @param Builder $query
-     * @param bool $wrap
      * @return string
      */
-    public function rawSql(Builder $query, $wrap = true)
+    public function sql(Builder $query)
     {
         return $this->format(vsprintf(
-            $this->toSql($query->toSql(), $wrap),
+            $this->toSql($query->toSql()),
             $this->toBindings($query->getBindings())
         ));
     }
@@ -32,16 +63,11 @@ class Dumper
 
     /**
      * @param string $sql
-     * @param bool $wrap
      * @return string
      */
-    private function toSql($sql, $wrap)
+    private function toSql($sql)
     {
-        $sql = $wrap ? $sql : preg_replace_callback('/[`"\[](?<column>[^`"\[\]]+)[`"\]]/', function ($matches) {
-            return ! empty($matches['column']) ? $matches['column'] : $matches[0];
-        }, $sql);
-
-        return str_replace(['%', '?'], ['%%', '%s'], $sql);
+        return str_replace(['%', '?'], ['%%', '%s'], $this->quoteSql($sql));
     }
 
     /**
@@ -76,5 +102,30 @@ class Dumper
     private function value($binding)
     {
         return sprintf("'%s'", $binding);
+    }
+
+    /**
+     * @param string $sql
+     * @return string
+     */
+    private function quoteSql(string $sql)
+    {
+        if (in_array($this->driver, [null, 'default'], true)) {
+            return $sql;
+        }
+
+        $quoteLookup = [
+            self::NONE => ['', ''],
+            self::MYSQL => ['`', '`'],
+            self::SQLITE => ['"', '"'],
+            self::POSTGRES => ['"', '"'],
+            self::MSSQL => ['[', ']'],
+        ];
+
+        list($leftQuote, $rightQuote) = $quoteLookup[$this->driver];
+
+        return preg_replace_callback('/[`"\[](?<column>[^`"\[\]]+)[`"\]]/', function ($matches) use ($rightQuote, $leftQuote) {
+            return ! empty($matches['column']) ? $leftQuote.$matches['column'].$rightQuote : $matches[0];
+        }, $sql);
     }
 }

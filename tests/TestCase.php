@@ -21,11 +21,18 @@ abstract class TestCase extends BaseCase
 {
     use MockeryPHPUnitIntegration;
 
+    /**
+     * @param Builder $query
+     * @return false|string
+     */
     protected function getDriver(Builder $query)
     {
         return get_class($query->getGrammar());
     }
 
+    /**
+     * @return Builder
+     */
     protected function mysql()
     {
         $connection = m::mock(ConnectionInterface::class);
@@ -35,6 +42,9 @@ abstract class TestCase extends BaseCase
         return new Builder($connection);
     }
 
+    /**
+     * @return Builder
+     */
     protected function sqlite()
     {
         $connection = m::mock(ConnectionInterface::class);
@@ -44,6 +54,9 @@ abstract class TestCase extends BaseCase
         return new Builder($connection);
     }
 
+    /**
+     * @return Builder
+     */
     protected function sqlServer()
     {
         $connection = m::mock(ConnectionInterface::class);
@@ -53,6 +66,9 @@ abstract class TestCase extends BaseCase
         return new Builder($connection);
     }
 
+    /**
+     * @return Builder
+     */
     protected function postgres()
     {
         $connection = m::mock(ConnectionInterface::class);
@@ -62,9 +78,13 @@ abstract class TestCase extends BaseCase
         return new Builder($connection);
     }
 
-    protected function givenDumper()
+    /**
+     * @param string|null $driver
+     * @return StubDumper
+     */
+    protected function givenDumper($driver = null)
     {
-        return new StubDumper();
+        return (new StubDumper())->setDriver($driver ?: Dumper::DEFAULT);
     }
 }
 
