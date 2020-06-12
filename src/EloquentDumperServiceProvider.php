@@ -2,6 +2,7 @@
 
 namespace Recca0120\EloquentDumper;
 
+use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Arr;
@@ -16,18 +17,20 @@ class EloquentDumperServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom(__DIR__.'/../config/eloquent-dumper.php', 'eloquent-dumper');
+
         $this->app->singleton(Dumper::class, function ($app) {
             return new Dumper(
                 Arr::get($app['config'], 'eloquent-dumper.driver', Dumper::DEFAULT)
             );
         });
 
-        $closures = $this->getClosures();
+        $this->app->singleton(EloquentHelper::class, EloquentHelper::class);
 
-        Builder::macro($closures['sql']['name'], $closures['sql']['method']);
-        QueryBuilder::macro($closures['sql']['name'], $closures['sql']['method']);
-        Builder::macro($closures['dump']['name'], $closures['dump']['method']);
-        QueryBuilder::macro($closures['dump']['name'], $closures['dump']['method']);
+        Builder::macro('sql', self::sql());
+        QueryBuilder::macro('sql', self::sql());
+        Builder::macro('dumpSql', self::dump());
+        QueryBuilder::macro('dumpSql', self::dump());
     }
 
     /**
@@ -45,33 +48,22 @@ class EloquentDumperServiceProvider extends ServiceProvider
     }
 
     /**
-     * @return array[]
+     * @return Closure
      */
-    private function getClosures()
+    private static function sql()
     {
-        $app = $this->app;
+        return function () {
+            return app(EloquentHelper::class)->sql($this);
+        };
+    }
 
-        return [
-            'sql' => [
-                'name' => 'sql',
-                'method' => function () use ($app) {
-                    return $app->make(Dumper::class)->dump($this->toSql(), $this->getBindings());
-                },
-            ],
-            'dump' => [
-                'name' => 'dumpSql',
-                'method' => function () use ($app) {
-                    $sql = $app->make(Dumper::class)->dump($this->toSql(), $this->getBindings());
-
-                    if ($app->runningInConsole()) {
-                        echo "\n".$sql."\n";
-
-                        return;
-                    }
-
-                    function_exists('dump') ? dump($sql) : var_dump($sql);
-                },
-            ],
-        ];
+    /**
+     * @return Closure
+     */
+    private static function dump()
+    {
+        return function () {
+            return app(EloquentHelper::class)->dump($this);
+        };
     }
 }
