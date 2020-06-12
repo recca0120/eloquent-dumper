@@ -17,41 +17,17 @@ class EloquentDumperServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(Dumper::class, function ($app) {
-            $config = Arr::get($app['config'], 'eloquent-dumper', [
-                'driver' => Dumper::DEFAULT,
-            ]);
-
-            return new Dumper($config['driver']);
+            return new Dumper(
+                Arr::get($app['config'], 'eloquent-dumper.driver', Dumper::DEFAULT)
+            );
         });
 
-        $sql = function (QueryBuilder $query) {
-            return app(Dumper::class)->sql($query);
-        };
+        $closures = $this->getClosures();
 
-        $dumpSql = function (QueryBuilder $query) use ($sql) {
-            $sql = $sql($query);
-            if (app()->runningInConsole()) {
-                echo "\n" . $sql . "\n";
-            } else {
-                dump($sql);
-            }
-
-            return $this;
-        };
-
-        Builder::macro('sql', function () use ($sql) {
-            return $sql($this->query);
-        });
-        QueryBuilder::macro('sql', function () use ($sql) {
-            return $sql($this);
-        });
-
-        Builder::macro('dumpSql', function () use ($dumpSql) {
-            return $dumpSql($this->query);
-        });
-        QueryBuilder::macro('dumpSql', function () use ($dumpSql) {
-            return $dumpSql($this);
-        });
+        Builder::macro($closures['sql']['name'], $closures['sql']['method']);
+        QueryBuilder::macro($closures['sql']['name'], $closures['sql']['method']);
+        Builder::macro($closures['dump']['name'], $closures['dump']['method']);
+        QueryBuilder::macro($closures['dump']['name'], $closures['dump']['method']);
     }
 
     /**
@@ -63,8 +39,39 @@ class EloquentDumperServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/eloquent-dumper.php' => config_path('eloquent-dumper.php'),
+                __DIR__.'/../config/eloquent-dumper.php' => config_path('eloquent-dumper.php'),
             ], 'eloquent-dumper');
         }
+    }
+
+    /**
+     * @return array[]
+     */
+    private function getClosures()
+    {
+        $app = $this->app;
+
+        return [
+            'sql' => [
+                'name' => 'sql',
+                'method' => function () use ($app) {
+                    return $app->make(Dumper::class)->dump($this->toSql(), $this->getBindings());
+                },
+            ],
+            'dump' => [
+                'name' => 'dumpSql',
+                'method' => function () use ($app) {
+                    $sql = $app->make(Dumper::class)->dump($this->toSql(), $this->getBindings());
+
+                    if ($app->runningInConsole()) {
+                        echo "\n".$sql."\n";
+
+                        return;
+                    }
+
+                    function_exists('dump') ? dump($sql) : var_dump($sql);
+                },
+            ],
+        ];
     }
 }

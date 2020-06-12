@@ -20,7 +20,7 @@ class DumperTest extends TestCase
             ->where('name', 'foo')
             ->where('password', 'bar');
 
-        $this->assertEquals($expected, $dumper->sql($query), $this->getDriver($query));
+        $this->assertSql($expected, $dumper, $query);
     }
 
     public function simpleProvider()
@@ -44,7 +44,7 @@ class DumperTest extends TestCase
 
         $query->from('users')->whereIn('id', [1, 2, 3, 4, 5]);
 
-        $this->assertEquals($expected, $dumper->sql($query), $this->getDriver($query));
+        $this->assertSql($expected, $dumper, $query);
     }
 
     public function inProvider()
@@ -68,7 +68,7 @@ class DumperTest extends TestCase
 
         $query->from('users')->whereIn('id', [1, 2, 3, 4, 5]);
 
-        $this->assertEquals($expected, $dumper->sql($query), $this->getDriver($query));
+        $this->assertSql($expected, $dumper, $query);
     }
 
     public function getNoneDriverProvider()
@@ -92,7 +92,7 @@ class DumperTest extends TestCase
 
         $query->from('users')->whereIn('id', [1, 2, 3, 4, 5]);
 
-        $this->assertEquals($expected, $dumper->sql($query), $this->getDriver($query));
+        $this->assertSql($expected, $dumper, $query);
     }
 
     public function getMySQLDriverProvider()
@@ -116,7 +116,7 @@ class DumperTest extends TestCase
 
         $query->from('users')->whereIn('id', [1, 2, 3, 4, 5]);
 
-        $this->assertEquals($expected, $dumper->sql($query), $this->getDriver($query));
+        $this->assertSql($expected, $dumper, $query);
     }
 
     public function getSqliteDriverProvider()
@@ -140,7 +140,7 @@ class DumperTest extends TestCase
 
         $query->from('users')->whereIn('id', [1, 2, 3, 4, 5]);
 
-        $this->assertEquals($expected, $dumper->sql($query), $this->getDriver($query));
+        $this->assertSql($expected, $dumper, $query);
     }
 
     public function getPostgresDriverProvider()
@@ -164,7 +164,7 @@ class DumperTest extends TestCase
 
         $query->from('users')->whereIn('id', [1, 2, 3, 4, 5]);
 
-        $this->assertEquals($expected, $dumper->sql($query), $this->getDriver($query));
+        $this->assertSql($expected, $dumper, $query);
     }
 
     public function getMsSQLDriverProvider()
@@ -175,5 +175,19 @@ class DumperTest extends TestCase
             [$this->postgres(), 'select * from [users] where [id] in (1, 2, 3, 4, 5)'],
             [$this->sqlServer(), 'select * from [users] where [id] in (1, 2, 3, 4, 5)'],
         ];
+    }
+
+    /**
+     * @param string $expected
+     * @param StubDumper $dumper
+     * @param Builder $query
+     */
+    private function assertSql(string $expected, StubDumper $dumper, Builder $query)
+    {
+        $this->assertEquals(
+            $expected,
+            $dumper->dump($query->toSql(), $query->getBindings()),
+            $this->getDriver($query)
+        );
     }
 }

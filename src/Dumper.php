@@ -3,7 +3,6 @@
 namespace Recca0120\EloquentDumper;
 
 use DateTime;
-use Illuminate\Database\Query\Builder;
 use PhpMyAdmin\SqlParser\Utils\Formatter;
 
 class Dumper
@@ -41,15 +40,13 @@ class Dumper
     }
 
     /**
-     * @param Builder $query
+     * @param string $sql
+     * @param array $bindings
      * @return string
      */
-    public function sql(Builder $query)
+    public function dump($sql, $bindings)
     {
-        return $this->format(vsprintf(
-            $this->toSql($query->toSql()),
-            $this->toBindings($query->getBindings())
-        ));
+        return $this->format(vsprintf($this->toSql($sql), $this->toBindings($bindings)));
     }
 
     /**
@@ -117,7 +114,7 @@ class Dumper
         list($left, $right) = $this->getQuote();
 
         return preg_replace_callback('/[`"\[](?<column>[^`"\[\]]+)[`"\]]/', function ($matches) use ($right, $left) {
-            return !empty($matches['column']) ? $left . $matches['column'] . $right : $matches[0];
+            return ! empty($matches['column']) ? $left.$matches['column'].$right : $matches[0];
         }, $sql);
     }
 
