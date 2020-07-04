@@ -88,6 +88,10 @@ class Dumper
                 return $this->value($binding->format('Y-m-d H:i:s'));
             }
 
+            if (is_object($binding) && method_exists($binding, '__toString')) {
+                return $this->value($binding->__toString());
+            }
+
             return $binding;
         }, $bindings);
     }
@@ -111,10 +115,10 @@ class Dumper
             return $sql;
         }
 
-        list($left, $right) = $this->getQuote();
+        [$left, $right] = $this->getQuote();
 
         return preg_replace_callback('/[`"\[](?<column>[^`"\[\]]+)[`"\]]/', function ($matches) use ($right, $left) {
-            return ! empty($matches['column']) ? $left.$matches['column'].$right : $matches[0];
+            return !empty($matches['column']) ? $left . $matches['column'] . $right : $matches[0];
         }, $sql);
     }
 
