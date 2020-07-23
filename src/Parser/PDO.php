@@ -2,7 +2,7 @@
 
 namespace Recca0120\EloquentDumper\Parser;
 
-class Defaults extends Parser
+class PDO extends Parser
 {
     /**
      * @param string $sql

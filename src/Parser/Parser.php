@@ -33,7 +33,7 @@ abstract class Parser
     {
         $driver = $driver !== null && array_key_exists(strtolower($driver), static::$lookup)
             ? __NAMESPACE__.'\\'.static::$lookup[strtolower($driver)]
-            : Defaults::class;
+            : PDO::class;
 
         return new $driver();
     }

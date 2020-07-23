@@ -8,7 +8,7 @@ use Recca0120\EloquentDumper\Parser\Parser;
 
 class Dumper
 {
-    const DEFAULT = 'default';
+    const PDO = 'pdo';
     const NONE = 'none';
     const MYSQL = 'mysql';
     const SQLITE = 'sqlite';
@@ -25,7 +25,7 @@ class Dumper
      * Dumper constructor.
      * @param string $driver
      */
-    public function __construct($driver = 'default')
+    public function __construct($driver = self::PDO)
     {
         $this->setDriver($driver);
     }

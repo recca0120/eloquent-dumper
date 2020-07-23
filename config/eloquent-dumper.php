@@ -2,7 +2,7 @@
 
 return [
     /*
-     * Supported: "default", "mysql", "sqlite", "postgres", "mssql"
+     * Supported: "pdo", "mysql", "sqlite", "postgres", "mssql"
      */
-    'driver' => env('ELOQUENT_DUMPER_DRIVER', 'default'),
+    'driver' => env('ELOQUENT_DUMPER_DRIVER', 'pdo'),
 ];

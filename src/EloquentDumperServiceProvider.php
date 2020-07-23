@@ -21,7 +21,7 @@ class EloquentDumperServiceProvider extends ServiceProvider
 
         $this->app->singleton(Dumper::class, function ($app) {
             return new Dumper(
-                Arr::get($app['config'], 'eloquent-dumper.driver', Dumper::DEFAULT)
+                Arr::get($app['config'], 'eloquent-dumper.driver', Dumper::PDO)
             );
         });
 
