@@ -1,8 +1,8 @@
 <?php
 
-namespace Recca0120\EloquentDumper\Parser;
+namespace Recca0120\EloquentDumper\Driver;
 
-class PDO extends Parser
+class SqlServer extends Driver
 {
     /**
      * @param string $sql
@@ -10,7 +10,7 @@ class PDO extends Parser
      */
     public function columnize($sql)
     {
-        return $sql;
+        return $this->replaceColumnQuotedIdentifiers($sql, ['[', ']']);
     }
 
     /**

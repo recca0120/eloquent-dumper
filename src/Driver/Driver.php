@@ -1,8 +1,8 @@
 <?php
 
-namespace Recca0120\EloquentDumper\Parser;
+namespace Recca0120\EloquentDumper\Driver;
 
-abstract class Parser
+abstract class Driver
 {
     private static $lookup = [
         'mysql' => 'MySQL',
@@ -27,7 +27,7 @@ abstract class Parser
 
     /**
      * @param string|null $driver
-     * @return Parser
+     * @return Driver
      */
     public static function factory($driver)
     {
@@ -45,7 +45,8 @@ abstract class Parser
      */
     protected function replaceColumnQuotedIdentifiers($sql, $columnQuotedIdentifiers)
     {
-        [$left, $right] = $columnQuotedIdentifiers;
+        $left = $columnQuotedIdentifiers[0];
+        $right = $columnQuotedIdentifiers[1];
 
         return preg_replace_callback('/[`"\[](?<column>[^`"\[\]]+)[`"\]]/', function ($matches) use ($right, $left) {
             return ! empty($matches['column']) ? $left.$matches['column'].$right : $matches[0];

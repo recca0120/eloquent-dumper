@@ -4,7 +4,7 @@ namespace Recca0120\EloquentDumper;
 
 use DateTime;
 use PhpMyAdmin\SqlParser\Utils\Formatter;
-use Recca0120\EloquentDumper\Parser\Parser;
+use Recca0120\EloquentDumper\Driver\Driver;
 
 class Dumper
 {
@@ -17,7 +17,7 @@ class Dumper
     const MSSQL = 'mssql';
 
     /**
-     * @var Parser
+     * @var Driver
      */
     private $parser;
 
@@ -36,7 +36,7 @@ class Dumper
      */
     public function setDriver($driver)
     {
-        $this->parser = Parser::factory($driver);
+        $this->parser = Driver::factory($driver);
 
         return $this;
     }

@@ -1,8 +1,8 @@
 <?php
 
-namespace Recca0120\EloquentDumper\Parser;
+namespace Recca0120\EloquentDumper\Driver;
 
-class None extends Parser
+class Postgres extends Driver
 {
     /**
      * @param string $sql
@@ -10,7 +10,7 @@ class None extends Parser
      */
     public function columnize($sql)
     {
-        return $this->replaceColumnQuotedIdentifiers($sql, ['', '']);
+        return $this->replaceColumnQuotedIdentifiers($sql, ['"', '"']);
     }
 
     /**
