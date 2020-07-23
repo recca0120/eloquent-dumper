@@ -84,7 +84,7 @@ abstract class TestCase extends BaseCase
      */
     protected function givenDumper($driver = null)
     {
-        return (new StubDumper())->setDriver($driver ?: Dumper::PDO);
+        return (new StubDumper())->setGrammar($driver ?: Dumper::PDO);
     }
 }
 

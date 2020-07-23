@@ -1,8 +1,8 @@
 <?php
 
-namespace Recca0120\EloquentDumper\Driver;
+namespace Recca0120\EloquentDumper\Grammars;
 
-class None extends Driver
+class PostgresGrammar extends Grammar
 {
     /**
      * @param string $sql
@@ -10,7 +10,7 @@ class None extends Driver
      */
     public function columnize($sql)
     {
-        return $this->replaceColumnQuotedIdentifiers($sql, ['', '']);
+        return $this->replaceColumnQuotedIdentifiers($sql, ['"', '"']);
     }
 
     /**

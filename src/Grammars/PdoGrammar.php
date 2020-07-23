@@ -1,8 +1,8 @@
 <?php
 
-namespace Recca0120\EloquentDumper\Driver;
+namespace Recca0120\EloquentDumper\Grammars;
 
-class PDO extends Driver
+class PdoGrammar extends Grammar
 {
     /**
      * @param string $sql

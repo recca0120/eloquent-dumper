@@ -4,7 +4,7 @@ namespace Recca0120\EloquentDumper;
 
 use DateTime;
 use PhpMyAdmin\SqlParser\Utils\Formatter;
-use Recca0120\EloquentDumper\Driver\Driver;
+use Recca0120\EloquentDumper\Grammars\Grammar;
 
 class Dumper
 {
@@ -17,26 +17,26 @@ class Dumper
     const MSSQL = 'mssql';
 
     /**
-     * @var Driver
+     * @var Grammar
      */
-    private $parser;
+    private $grammar;
 
     /**
      * Dumper constructor.
-     * @param string $driver
+     * @param string $grammar
      */
-    public function __construct($driver = self::PDO)
+    public function __construct($grammar = self::PDO)
     {
-        $this->setDriver($driver);
+        $this->setGrammar($grammar);
     }
 
     /**
-     * @param string $driver
+     * @param string $grammar
      * @return $this
      */
-    public function setDriver($driver)
+    public function setGrammar($grammar)
     {
-        $this->parser = Driver::factory($driver);
+        $this->grammar = Grammar::factory($grammar);
 
         return $this;
     }
@@ -66,7 +66,7 @@ class Dumper
      */
     private function toSql($sql)
     {
-        return str_replace(['%', '?'], ['%%', '%s'], $this->parser->columnize($sql));
+        return str_replace(['%', '?'], ['%%', '%s'], $this->grammar->columnize($sql));
     }
 
     /**
@@ -78,20 +78,20 @@ class Dumper
         return array_map(function ($binding) {
             if (is_array($binding)) {
                 $binding = implode(', ', array_map(function ($value) {
-                    return is_string($value) === true ? $this->parser->parameterize($value) : $value;
+                    return is_string($value) === true ? $this->grammar->parameterize($value) : $value;
                 }, $binding));
             }
 
             if (is_string($binding)) {
-                return $this->parser->parameterize($binding);
+                return $this->grammar->parameterize($binding);
             }
 
             if ($binding instanceof DateTime) {
-                return $this->parser->parameterize($binding->format('Y-m-d H:i:s'));
+                return $this->grammar->parameterize($binding->format('Y-m-d H:i:s'));
             }
 
             if (is_object($binding) && method_exists($binding, '__toString')) {
-                return $this->parser->parameterize($binding->__toString());
+                return $this->grammar->parameterize($binding->__toString());
             }
 
             return $binding;

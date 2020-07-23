@@ -1,16 +1,16 @@
 <?php
 
-namespace Recca0120\EloquentDumper\Driver;
+namespace Recca0120\EloquentDumper\Grammars;
 
-abstract class Driver
+abstract class Grammar
 {
     private static $lookup = [
-        'mysql' => 'MySQL',
-        'none' => 'None',
-        'postgres' => 'Postgres',
-        'sqlite' => 'sqlite',
-        'sqlserver' => 'SqlServer',
-        'mssql' => 'SqlServer',
+        'mysql' => MySqlGrammar::class,
+        'none' => NoneGrammar::class,
+        'postgres' => PostgresGrammar::class,
+        'sqlite' => SQLiteGrammar::class,
+        'sqlserver' => SqlServerGrammar::class,
+        'mssql' => SqlServerGrammar::class,
     ];
 
     /**
@@ -27,13 +27,13 @@ abstract class Driver
 
     /**
      * @param string|null $driver
-     * @return Driver
+     * @return Grammar
      */
     public static function factory($driver)
     {
         $driver = $driver !== null && array_key_exists(strtolower($driver), static::$lookup)
-            ? __NAMESPACE__.'\\'.static::$lookup[strtolower($driver)]
-            : PDO::class;
+            ? static::$lookup[strtolower($driver)]
+            : PdoGrammar::class;
 
         return new $driver();
     }
