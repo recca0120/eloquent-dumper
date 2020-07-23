@@ -167,6 +167,20 @@ class DumperTest extends TestCase
         $this->assertSql($expected, $dumper, $query);
     }
 
+    /**
+     * @dataProvider getMsSQLDriverProvider
+     * @param Builder $query
+     * @param string $expected
+     */
+    public function test_it_should_convert_to_sqlserver_version_sql(Builder $query, $expected)
+    {
+        $dumper = $this->givenDumper(Dumper::SQLSERVER);
+
+        $query->from('users')->whereIn('id', [1, 2, 3, 4, 5]);
+
+        $this->assertSql($expected, $dumper, $query);
+    }
+
     public function getMsSQLDriverProvider()
     {
         return [

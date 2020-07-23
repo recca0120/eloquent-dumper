@@ -4,6 +4,7 @@ namespace Recca0120\EloquentDumper;
 
 use DateTime;
 use PhpMyAdmin\SqlParser\Utils\Formatter;
+use Recca0120\EloquentDumper\Parser\Parser;
 
 class Dumper
 {
@@ -12,12 +13,13 @@ class Dumper
     const MYSQL = 'mysql';
     const SQLITE = 'sqlite';
     const POSTGRES = 'postgres';
+    const SQLSERVER = 'sqlserver';
     const MSSQL = 'mssql';
 
     /**
-     * @var null
+     * @var Parser
      */
-    private $driver;
+    private $parser;
 
     /**
      * Dumper constructor.
@@ -25,7 +27,7 @@ class Dumper
      */
     public function __construct($driver = 'default')
     {
-        $this->driver = $driver;
+        $this->setDriver($driver);
     }
 
     /**
@@ -34,7 +36,7 @@ class Dumper
      */
     public function setDriver($driver)
     {
-        $this->driver = $driver;
+        $this->parser = Parser::factory($driver);
 
         return $this;
     }
@@ -64,7 +66,7 @@ class Dumper
      */
     private function toSql($sql)
     {
-        return str_replace(['%', '?'], ['%%', '%s'], $this->quoteSql($sql));
+        return str_replace(['%', '?'], ['%%', '%s'], $this->parser->columnize($sql));
     }
 
     /**
@@ -103,38 +105,5 @@ class Dumper
     private function value($binding)
     {
         return sprintf("'%s'", $binding);
-    }
-
-    /**
-     * @param string $sql
-     * @return string
-     */
-    private function quoteSql(string $sql)
-    {
-        if (in_array($this->driver, [null, 'default'], true)) {
-            return $sql;
-        }
-
-        [$left, $right] = $this->getQuote();
-
-        return preg_replace_callback('/[`"\[](?<column>[^`"\[\]]+)[`"\]]/', function ($matches) use ($right, $left) {
-            return !empty($matches['column']) ? $left . $matches['column'] . $right : $matches[0];
-        }, $sql);
-    }
-
-    /**
-     * @return string[]
-     */
-    private function getQuote()
-    {
-        $quoteLookup = [
-            self::NONE => ['', ''],
-            self::MYSQL => ['`', '`'],
-            self::SQLITE => ['"', '"'],
-            self::POSTGRES => ['"', '"'],
-            self::MSSQL => ['[', ']'],
-        ];
-
-        return $quoteLookup[$this->driver];
     }
 }
