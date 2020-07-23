@@ -3,8 +3,10 @@
 namespace Recca0120\EloquentDumper;
 
 use DateTime;
+use PDO;
 use PhpMyAdmin\SqlParser\Utils\Formatter;
 use Recca0120\EloquentDumper\Grammars\Grammar;
+use Recca0120\EloquentDumper\Grammars\PdoGrammar;
 
 class Dumper
 {
@@ -28,6 +30,17 @@ class Dumper
     public function __construct($grammar = self::PDO)
     {
         $this->setGrammar($grammar);
+    }
+
+    /**
+     * @param PDO $pdo
+     * @return $this
+     */
+    public function setPdo(PDO $pdo)
+    {
+        PdoGrammar::setPdo($pdo);
+
+        return $this;
     }
 
     /**

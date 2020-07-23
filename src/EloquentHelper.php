@@ -13,10 +13,6 @@ class EloquentHelper
      */
     private $dumper;
     /**
-     * @var bool
-     */
-    private $runningInConsole;
-    /**
      * @var Application
      */
     private $app;
@@ -38,6 +34,8 @@ class EloquentHelper
      */
     public function sql($query)
     {
+        $this->dumper->setPdo($query->getConnection()->getPdo());
+
         return $this->dumper->dump($query->toSql(), $query->getBindings());
     }
 
