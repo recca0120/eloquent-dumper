@@ -12,4 +12,13 @@ class Defaults extends Parser
     {
         return $sql;
     }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    public function parameterize($value)
+    {
+        return $this->quoteString($value);
+    }
 }

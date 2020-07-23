@@ -78,32 +78,23 @@ class Dumper
         return array_map(function ($binding) {
             if (is_array($binding)) {
                 $binding = implode(', ', array_map(function ($value) {
-                    return is_string($value) === true ? $this->value($value) : $value;
+                    return is_string($value) === true ? $this->parser->parameterize($value) : $value;
                 }, $binding));
             }
 
             if (is_string($binding)) {
-                return $this->value($binding);
+                return $this->parser->parameterize($binding);
             }
 
             if ($binding instanceof DateTime) {
-                return $this->value($binding->format('Y-m-d H:i:s'));
+                return $this->parser->parameterize($binding->format('Y-m-d H:i:s'));
             }
 
             if (is_object($binding) && method_exists($binding, '__toString')) {
-                return $this->value($binding->__toString());
+                return $this->parser->parameterize($binding->__toString());
             }
 
             return $binding;
         }, $bindings);
-    }
-
-    /**
-     * @param $binding
-     * @return string
-     */
-    private function value($binding)
-    {
-        return sprintf("'%s'", $binding);
     }
 }

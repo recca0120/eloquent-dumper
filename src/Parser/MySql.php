@@ -12,4 +12,13 @@ class MySql extends Parser
     {
         return $this->replaceColumnQuotedIdentifiers($sql, ['`', '`']);
     }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    public function parameterize($value)
+    {
+        return $this->quoteString($value);
+    }
 }

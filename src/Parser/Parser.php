@@ -20,6 +20,12 @@ abstract class Parser
     abstract public function columnize($sql);
 
     /**
+     * @param string $value
+     * @return string
+     */
+    abstract public function parameterize($value);
+
+    /**
      * @param string|null $driver
      * @return Parser
      */
@@ -44,5 +50,14 @@ abstract class Parser
         return preg_replace_callback('/[`"\[](?<column>[^`"\[\]]+)[`"\]]/', function ($matches) use ($right, $left) {
             return ! empty($matches['column']) ? $left.$matches['column'].$right : $matches[0];
         }, $sql);
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    protected function quoteString($value)
+    {
+        return "'$value'";
     }
 }
