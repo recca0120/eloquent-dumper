@@ -79,12 +79,12 @@ abstract class TestCase extends BaseCase
     }
 
     /**
-     * @param string|null $driver
+     * @param string|null $grammar
      * @return StubDumper
      */
-    protected function givenDumper($driver = null)
+    protected function givenDumper($grammar = null)
     {
-        return (new StubDumper())->setGrammar($driver ?: Dumper::PDO);
+        return (new StubDumper())->setGrammar($grammar ?: Dumper::PDO);
     }
 }
 

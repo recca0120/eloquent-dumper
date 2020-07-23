@@ -58,7 +58,7 @@ class DumperTest extends TestCase
     }
 
     /**
-     * @dataProvider getNoneDriverProvider
+     * @dataProvider noneGrammarProvider
      * @param Builder $query
      * @param string $expected
      */
@@ -71,7 +71,7 @@ class DumperTest extends TestCase
         $this->assertSql($expected, $dumper, $query);
     }
 
-    public function getNoneDriverProvider()
+    public function noneGrammarProvider()
     {
         return [
             [$this->mysql(), 'select * from users where id in (1, 2, 3, 4, 5)'],
@@ -82,7 +82,7 @@ class DumperTest extends TestCase
     }
 
     /**
-     * @dataProvider getMySQLDriverProvider
+     * @dataProvider mySQLGrammarProvider
      * @param Builder $query
      * @param string $expected
      */
@@ -95,7 +95,7 @@ class DumperTest extends TestCase
         $this->assertSql($expected, $dumper, $query);
     }
 
-    public function getMySQLDriverProvider()
+    public function mySQLGrammarProvider()
     {
         return [
             [$this->mysql(), 'select * from `users` where `id` in (1, 2, 3, 4, 5)'],
@@ -106,7 +106,7 @@ class DumperTest extends TestCase
     }
 
     /**
-     * @dataProvider getSqliteDriverProvider
+     * @dataProvider sqliteGrammarProvider
      * @param Builder $query
      * @param string $expected
      */
@@ -119,7 +119,7 @@ class DumperTest extends TestCase
         $this->assertSql($expected, $dumper, $query);
     }
 
-    public function getSqliteDriverProvider()
+    public function sqliteGrammarProvider()
     {
         return [
             [$this->mysql(), 'select * from "users" where "id" in (1, 2, 3, 4, 5)'],
@@ -130,7 +130,7 @@ class DumperTest extends TestCase
     }
 
     /**
-     * @dataProvider getPostgresDriverProvider
+     * @dataProvider postgresGrammarProvider
      * @param Builder $query
      * @param string $expected
      */
@@ -143,7 +143,7 @@ class DumperTest extends TestCase
         $this->assertSql($expected, $dumper, $query);
     }
 
-    public function getPostgresDriverProvider()
+    public function postgresGrammarProvider()
     {
         return [
             [$this->mysql(), 'select * from "users" where "id" in (1, 2, 3, 4, 5)'],
@@ -154,7 +154,7 @@ class DumperTest extends TestCase
     }
 
     /**
-     * @dataProvider getMsSQLDriverProvider
+     * @dataProvider sqlServerGrammarProvider
      * @param Builder $query
      * @param string $expected
      */
@@ -168,7 +168,7 @@ class DumperTest extends TestCase
     }
 
     /**
-     * @dataProvider getMsSQLDriverProvider
+     * @dataProvider sqlServerGrammarProvider
      * @param Builder $query
      * @param string $expected
      */
@@ -181,7 +181,7 @@ class DumperTest extends TestCase
         $this->assertSql($expected, $dumper, $query);
     }
 
-    public function getMsSQLDriverProvider()
+    public function sqlServerGrammarProvider()
     {
         return [
             [$this->mysql(), 'select * from [users] where [id] in (1, 2, 3, 4, 5)'],
