@@ -196,7 +196,7 @@ class DumperTest extends TestCase
      * @param StubDumper $dumper
      * @param Builder $query
      */
-    private function assertSql(string $expected, StubDumper $dumper, Builder $query)
+    private function assertSql($expected, StubDumper $dumper, Builder $query)
     {
         $this->assertEquals(
             $expected,
