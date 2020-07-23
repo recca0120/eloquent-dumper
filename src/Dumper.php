@@ -95,16 +95,16 @@ class Dumper
                 }, $binding));
             }
 
-            if (is_string($binding)) {
-                return $this->grammar->parameterize($binding);
-            }
-
             if ($binding instanceof DateTime) {
                 return $this->grammar->parameterize($binding->format('Y-m-d H:i:s'));
             }
 
-            if (is_object($binding) && method_exists($binding, '__toString')) {
-                return $this->grammar->parameterize($binding->__toString());
+            if (is_string($binding) || is_object($binding) && method_exists($binding, '__toString')) {
+                return $this->grammar->parameterize((string) $binding);
+            }
+
+            if ($binding === null) {
+                return 'NULL';
             }
 
             return $binding;

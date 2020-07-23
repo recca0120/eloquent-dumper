@@ -23,7 +23,10 @@ abstract class Grammar
      * @param string $value
      * @return string
      */
-    abstract public function parameterize($value);
+    public function parameterize($value)
+    {
+        return $this->quoteString($this->escape($value));
+    }
 
     /**
      * @param string|null $driver
@@ -60,5 +63,14 @@ abstract class Grammar
     protected function quoteString($value)
     {
         return "'$value'";
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    protected function escape($value)
+    {
+        return $value;
     }
 }

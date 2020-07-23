@@ -17,8 +17,11 @@ class MySqlGrammar extends Grammar
      * @param string $value
      * @return string
      */
-    public function parameterize($value)
+    protected function escape($value)
     {
-        return $this->quoteString($value);
+        $search = ['\\', "\x00", "\n", "\r", "'", '"', "\x1a"];
+        $replace = ['\\\\', '\\0', '\\n', '\\r', "\'", '\"', '\\Z'];
+
+        return str_replace($search, $replace, $value);
     }
 }

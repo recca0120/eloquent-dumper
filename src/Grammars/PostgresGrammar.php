@@ -17,8 +17,8 @@ class PostgresGrammar extends Grammar
      * @param string $value
      * @return string
      */
-    public function parameterize($value)
+    protected function escape($value)
     {
-        return $this->quoteString($value);
+        return str_replace(["'", '\\'], ["''", '\\\\'], $value);
     }
 }

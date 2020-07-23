@@ -3,7 +3,6 @@
 namespace Recca0120\EloquentDumper\Grammars;
 
 use PDO;
-use function Sodium\add;
 
 class PdoGrammar extends Grammar
 {
@@ -32,6 +31,6 @@ class PdoGrammar extends Grammar
      */
     public function parameterize($value)
     {
-        return self::$pdo ? static::$pdo->quote($value) : $this->quoteString(addslashes($value));
+        return self::$pdo ? static::$pdo->quote($value) : parent::parameterize(addslashes($value));
     }
 }

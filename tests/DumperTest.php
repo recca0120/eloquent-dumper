@@ -90,7 +90,7 @@ class DumperTest extends TestCase
     {
         $dumper = $this->givenDumper(Dumper::MYSQL);
 
-        $query->from('users')->whereIn('id', [1, 2, 3, 4, 5]);
+        $query->from('users')->whereIn('id', [1, 2, 'App\User', 'don\'t be late']);
 
         $this->assertSql($expected, $dumper, $query);
     }
@@ -98,10 +98,10 @@ class DumperTest extends TestCase
     public function mySQLGrammarProvider()
     {
         return [
-            [$this->mysql(), 'select * from `users` where `id` in (1, 2, 3, 4, 5)'],
-            [$this->sqlite(), 'select * from `users` where `id` in (1, 2, 3, 4, 5)'],
-            [$this->postgres(), 'select * from `users` where `id` in (1, 2, 3, 4, 5)'],
-            [$this->sqlServer(), 'select * from `users` where `id` in (1, 2, 3, 4, 5)'],
+            [$this->mysql(), "select * from `users` where `id` in (1, 2, 'App\\\\User', 'don\'t be late')"],
+            [$this->sqlite(), "select * from `users` where `id` in (1, 2, 'App\\\\User', 'don\'t be late')"],
+            [$this->postgres(), "select * from `users` where `id` in (1, 2, 'App\\\\User', 'don\'t be late')"],
+            [$this->sqlServer(), "select * from `users` where `id` in (1, 2, 'App\\\\User', 'don\'t be late')"],
         ];
     }
 
@@ -114,7 +114,7 @@ class DumperTest extends TestCase
     {
         $dumper = $this->givenDumper(Dumper::SQLITE);
 
-        $query->from('users')->whereIn('id', [1, 2, 3, 4, 5]);
+        $query->from('users')->whereIn('id', [1, 2, 'App\User', 'don\'t be late']);
 
         $this->assertSql($expected, $dumper, $query);
     }
@@ -122,10 +122,10 @@ class DumperTest extends TestCase
     public function sqliteGrammarProvider()
     {
         return [
-            [$this->mysql(), 'select * from "users" where "id" in (1, 2, 3, 4, 5)'],
-            [$this->sqlite(), 'select * from "users" where "id" in (1, 2, 3, 4, 5)'],
-            [$this->postgres(), 'select * from "users" where "id" in (1, 2, 3, 4, 5)'],
-            [$this->sqlServer(), 'select * from "users" where "id" in (1, 2, 3, 4, 5)'],
+            [$this->mysql(), 'select * from "users" where "id" in (1, 2, \'App\\User\', \'don\'\'t be late\')'],
+            [$this->sqlite(), 'select * from "users" where "id" in (1, 2, \'App\\User\', \'don\'\'t be late\')'],
+            [$this->postgres(), 'select * from "users" where "id" in (1, 2, \'App\\User\', \'don\'\'t be late\')'],
+            [$this->sqlServer(), 'select * from "users" where "id" in (1, 2, \'App\\User\', \'don\'\'t be late\')'],
         ];
     }
 
@@ -138,7 +138,7 @@ class DumperTest extends TestCase
     {
         $dumper = $this->givenDumper(Dumper::POSTGRES);
 
-        $query->from('users')->whereIn('id', [1, 2, 3, 4, 5]);
+        $query->from('users')->whereIn('id', [1, 2, 'App\User', 'don\'t be late']);
 
         $this->assertSql($expected, $dumper, $query);
     }
@@ -146,10 +146,10 @@ class DumperTest extends TestCase
     public function postgresGrammarProvider()
     {
         return [
-            [$this->mysql(), 'select * from "users" where "id" in (1, 2, 3, 4, 5)'],
-            [$this->sqlite(), 'select * from "users" where "id" in (1, 2, 3, 4, 5)'],
-            [$this->postgres(), 'select * from "users" where "id" in (1, 2, 3, 4, 5)'],
-            [$this->sqlServer(), 'select * from "users" where "id" in (1, 2, 3, 4, 5)'],
+            [$this->mysql(), 'select * from "users" where "id" in (1, 2, \'App\\\\User\', \'don\'\'t be late\')'],
+            [$this->sqlite(), 'select * from "users" where "id" in (1, 2, \'App\\\\User\', \'don\'\'t be late\')'],
+            [$this->postgres(), 'select * from "users" where "id" in (1, 2, \'App\\\\User\', \'don\'\'t be late\')'],
+            [$this->sqlServer(), 'select * from "users" where "id" in (1, 2, \'App\\\\User\', \'don\'\'t be late\')'],
         ];
     }
 
