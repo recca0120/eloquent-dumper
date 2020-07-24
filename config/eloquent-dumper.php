@@ -4,5 +4,5 @@ return [
     /*
      * Supported: "pdo", "mysql", "sqlite", "postgres", "mssql"
      */
-    'grammar' => env('ELOQUENT_DUMPER_DRIVER', 'pdo'),
+    'grammar' => env('ELOQUENT_DUMPER_GRAMMAR', 'pdo'),
 ];

@@ -19,8 +19,8 @@ when you use sqlite in PHPUnit and you need MySQL version sql, you can set drive
 ```php
 // eloquent-dumper.php
 return [
-    // Supported: "default", "mysql", "sqlite", "postgres", "mssql"
-    'driver' => env('ELOQUENT_DUMPER_DRIVER', 'mysql'),
+    // Supported: "pdo", "mysql", "sqlite", "postgres", "mssql"
+    'driver' => env('ELOQUENT_DUMPER_GRAMMAR', 'mysql'),
 ];
 ```
 ## How to use
