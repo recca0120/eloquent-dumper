@@ -103,6 +103,10 @@ class Dumper
                 return $this->grammar->parameterize((string) $binding);
             }
 
+            if (is_bool($binding)) {
+                return $binding ? 1 : 0;
+            }
+
             if ($binding === null) {
                 return 'NULL';
             }
