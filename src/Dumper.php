@@ -10,12 +10,14 @@ use Recca0120\EloquentDumper\Grammars\PdoGrammar;
 
 class Dumper
 {
-    const PDO = 'pdo';
     const NONE = 'none';
+    const PDO = 'pdo';
     const MYSQL = 'mysql';
     const SQLITE = 'sqlite';
     const POSTGRES = 'postgres';
+    const PGSQL = 'pgsql';
     const SQLSERVER = 'sqlserver';
+    const SQLSRV = 'sqlsrv';
     const MSSQL = 'mssql';
 
     /**

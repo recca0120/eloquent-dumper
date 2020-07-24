@@ -2,15 +2,20 @@
 
 namespace Recca0120\EloquentDumper\Grammars;
 
+use Recca0120\EloquentDumper\Dumper;
+
 abstract class Grammar
 {
     private static $lookup = [
-        'mysql' => MySqlGrammar::class,
-        'none' => NoneGrammar::class,
-        'postgres' => PostgresGrammar::class,
-        'sqlite' => SQLiteGrammar::class,
-        'sqlserver' => SqlServerGrammar::class,
-        'mssql' => SqlServerGrammar::class,
+        Dumper::NONE => NoneGrammar::class,
+        Dumper::PDO => PdoGrammar::class,
+        Dumper::MYSQL => MySqlGrammar::class,
+        Dumper::SQLITE => SQLiteGrammar::class,
+        Dumper::POSTGRES => PostgresGrammar::class,
+        Dumper::PGSQL => PostgresGrammar::class,
+        Dumper::SQLSERVER => SqlServerGrammar::class,
+        Dumper::SQLSRV => SqlServerGrammar::class,
+        Dumper::MSSQL => SqlServerGrammar::class,
     ];
 
     /**
