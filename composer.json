@@ -10,7 +10,7 @@
     ],
     "type": "library",
     "require": {
-        "illuminate/database": "^5.1|^6.0|^7.0",
+        "illuminate/database": "^5.1|^6.0|^7.0|^8.0",
         "phpmyadmin/sql-parser": "^4.6|^5.3"
     },
     "require-dev": {
