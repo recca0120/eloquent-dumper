@@ -9,15 +9,15 @@ use Recca0120\EloquentDumper\Grammars\PdoGrammar;
 
 class Dumper
 {
-    public const NONE = 'none';
-    public const PDO = 'pdo';
-    public const MYSQL = 'mysql';
-    public const SQLITE = 'sqlite';
-    public const POSTGRES = 'postgres';
-    public const PGSQL = 'pgsql';
-    public const SQLSERVER = 'sqlserver';
-    public const SQLSRV = 'sqlsrv';
-    public const MSSQL = 'mssql';
+    const NONE = 'none';
+    const PDO = 'pdo';
+    const MYSQL = 'mysql';
+    const SQLITE = 'sqlite';
+    const POSTGRES = 'postgres';
+    const PGSQL = 'pgsql';
+    const SQLSERVER = 'sqlserver';
+    const SQLSRV = 'sqlsrv';
+    const MSSQL = 'mssql';
 
     /**
      * @var Grammar

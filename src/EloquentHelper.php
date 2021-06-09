@@ -5,6 +5,7 @@ namespace Recca0120\EloquentDumper;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Facades\DB;
 
 class EloquentHelper
 {
@@ -19,13 +20,12 @@ class EloquentHelper
 
     /**
      * EloquentHelper constructor.
-     * @param Dumper $dumper
      * @param Application $app
      */
-    public function __construct(Dumper $dumper, Application $app)
+    public function __construct(Application $app)
     {
-        $this->dumper = $dumper;
         $this->app = $app;
+        $this->dumper = $app->get(Dumper::class);
     }
 
     /**
@@ -56,5 +56,14 @@ class EloquentHelper
         function_exists('dump') ? dump($sql) : var_dump($sql);
 
         return $query;
+    }
+
+    public function getRawQueryLog($logs = [])
+    {
+        return array_map(function ($log) {
+            $log['query'] = $this->dumper->dump($log['query'], $log['bindings'], false);
+
+            return $log;
+        }, empty($logs) ? DB::getQueryLog() : $logs);
     }
 }
