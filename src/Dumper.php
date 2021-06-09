@@ -65,9 +65,11 @@ class Dumper
      * @param array $bindings
      * @return string
      */
-    public function dump($sql, $bindings)
+    public function dump($sql, $bindings, $format = true)
     {
-        return $this->format(vsprintf($this->toSql($sql), $this->toBindings($bindings)));
+        $raw = vsprintf($this->toSql($sql), $this->toBindings($bindings));
+
+        return $format ? $this->format($raw) : $raw;
     }
 
     /**

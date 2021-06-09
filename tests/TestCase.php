@@ -80,18 +80,10 @@ abstract class TestCase extends BaseCase
 
     /**
      * @param string|null $grammar
-     * @return StubDumper
+     * @return Dumper
      */
     protected function givenDumper($grammar = null)
     {
-        return (new StubDumper())->setGrammar($grammar ?: Dumper::PDO);
-    }
-}
-
-class StubDumper extends Dumper
-{
-    protected function format($sql)
-    {
-        return $sql;
+        return (new Dumper())->setGrammar($grammar ?: Dumper::PDO);
     }
 }

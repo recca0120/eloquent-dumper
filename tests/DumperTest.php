@@ -210,14 +210,14 @@ class DumperTest extends TestCase
 
     /**
      * @param string $expected
-     * @param StubDumper $dumper
+     * @param Dumper $dumper
      * @param Builder $query
      */
-    private function assertSql($expected, StubDumper $dumper, Builder $query)
+    private function assertSql($expected, Dumper $dumper, Builder $query)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
-            $dumper->dump($query->toSql(), $query->getBindings()),
+            $dumper->dump($query->toSql(), $query->getBindings(), false),
             $this->getDriver($query)
         );
     }
