@@ -50,6 +50,6 @@ class Converter
             return $binding ? 1 : 0;
         }
 
-        return $binding ?? 'NULL';
+        return $binding ?: 'NULL';
     }
 }

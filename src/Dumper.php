@@ -67,7 +67,7 @@ class Dumper
      */
     public function dump($sql, $bindings, $format = true)
     {
-        $raw = vsprintf($this->toSql($sql), $this->toBindings($bindings));
+        $raw = $this->bindValues($sql, $bindings);
 
         return $format ? $this->format($raw) : $raw;
     }
@@ -76,26 +76,21 @@ class Dumper
      * @param string $sql
      * @return string
      */
-    protected function format($sql)
+    private function format($sql)
     {
         return Formatter::format($sql);
     }
 
     /**
      * @param string $sql
+     * @param array $bindings
      * @return string
      */
-    private function toSql($sql)
+    private function bindValues($sql, $bindings)
     {
-        return str_replace(['%', '?'], ['%%', '%s'], $this->grammar->columnize($sql));
-    }
-
-    /**
-     * @param array $bindings
-     * @return array|string[]
-     */
-    private function toBindings($bindings)
-    {
-        return array_map([$this->converter, 'handle'], $bindings);
+        return vsprintf(
+            str_replace(['%', '?'], ['%%', '%s'], $this->grammar->columnize($sql)),
+            array_map([$this->converter, 'handle'], $bindings)
+        );
     }
 }

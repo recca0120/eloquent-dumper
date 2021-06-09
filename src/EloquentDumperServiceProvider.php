@@ -3,8 +3,8 @@
 namespace Recca0120\EloquentDumper;
 
 use Closure;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,10 +27,13 @@ class EloquentDumperServiceProvider extends ServiceProvider
 
         $this->app->singleton(EloquentHelper::class, EloquentHelper::class);
 
-        Builder::macro('sql', self::sql());
-        QueryBuilder::macro('sql', self::sql());
-        Builder::macro('dumpSql', self::dump());
-        QueryBuilder::macro('dumpSql', self::dump());
+        $this->registerBuilderMicro('toRawSql', function () {
+            return app(EloquentHelper::class)->toRawSql($this);
+        });
+
+        $this->registerBuilderMicro('dumpSql', function () {
+            return app(EloquentHelper::class)->dumpSql($this);
+        });
     }
 
     /**
@@ -47,23 +50,9 @@ class EloquentDumperServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * @return Closure
-     */
-    private static function sql()
+    private function registerBuilderMicro(string $method, Closure $closure)
     {
-        return function () {
-            return app(EloquentHelper::class)->sql($this);
-        };
-    }
-
-    /**
-     * @return Closure
-     */
-    private static function dump()
-    {
-        return function () {
-            return app(EloquentHelper::class)->dump($this);
-        };
+        Builder::macro($method, $closure);
+        EloquentBuilder::macro($method, $closure);
     }
 }

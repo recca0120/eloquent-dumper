@@ -32,20 +32,20 @@ class EloquentHelper
      * @param QueryBuilder|Builder $query
      * @return string
      */
-    public function sql($query)
+    public function toRawSql($query, $format = false)
     {
         $this->dumper->setPdo($query->getConnection()->getPdo());
 
-        return $this->dumper->dump($query->toSql(), $query->getBindings());
+        return $this->dumper->dump($query->toSql(), $query->getBindings(), $format);
     }
 
     /**
      * @param QueryBuilder|Builder $query
      * @return Builder|QueryBuilder
      */
-    public function dump($query)
+    public function dumpSql($query)
     {
-        $sql = $this->sql($query);
+        $sql = $this->toRawSql($query, true);
 
         if ($this->app->runningInConsole()) {
             echo "\n".$sql."\n";
@@ -61,9 +61,10 @@ class EloquentHelper
     public function getRawQueryLog($logs = [])
     {
         return array_map(function ($log) {
-            $log['query'] = $this->dumper->dump($log['query'], $log['bindings'], false);
-
-            return $log;
+            return [
+                'query' => $this->dumper->dump($log['query'], $log['bindings'], false),
+                'time' => $log['time'],
+            ];
         }, empty($logs) ? DB::getQueryLog() : $logs);
     }
 }
