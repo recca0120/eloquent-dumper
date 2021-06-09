@@ -23,7 +23,7 @@ abstract class TestCase extends BaseCase
 
     /**
      * @param Builder $query
-     * @return false|string
+     * @return string
      */
     protected function getDriver(Builder $query)
     {

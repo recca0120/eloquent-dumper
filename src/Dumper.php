@@ -2,7 +2,6 @@
 
 namespace Recca0120\EloquentDumper;
 
-use DateTime;
 use PDO;
 use PhpMyAdmin\SqlParser\Utils\Formatter;
 use Recca0120\EloquentDumper\Grammars\Grammar;
@@ -10,20 +9,24 @@ use Recca0120\EloquentDumper\Grammars\PdoGrammar;
 
 class Dumper
 {
-    const NONE = 'none';
-    const PDO = 'pdo';
-    const MYSQL = 'mysql';
-    const SQLITE = 'sqlite';
-    const POSTGRES = 'postgres';
-    const PGSQL = 'pgsql';
-    const SQLSERVER = 'sqlserver';
-    const SQLSRV = 'sqlsrv';
-    const MSSQL = 'mssql';
+    public const NONE = 'none';
+    public const PDO = 'pdo';
+    public const MYSQL = 'mysql';
+    public const SQLITE = 'sqlite';
+    public const POSTGRES = 'postgres';
+    public const PGSQL = 'pgsql';
+    public const SQLSERVER = 'sqlserver';
+    public const SQLSRV = 'sqlsrv';
+    public const MSSQL = 'mssql';
 
     /**
      * @var Grammar
      */
     private $grammar;
+    /**
+     * @var Converter
+     */
+    private $converter;
 
     /**
      * Dumper constructor.
@@ -52,6 +55,7 @@ class Dumper
     public function setGrammar($grammar)
     {
         $this->grammar = Grammar::factory($grammar);
+        $this->converter = new Converter($this->grammar);
 
         return $this;
     }
@@ -90,30 +94,6 @@ class Dumper
      */
     private function toBindings($bindings)
     {
-        return array_map(function ($binding) {
-            if (is_array($binding)) {
-                $binding = implode(', ', array_map(function ($value) {
-                    return is_string($value) === true ? $this->grammar->parameterize($value) : $value;
-                }, $binding));
-            }
-
-            if ($binding instanceof DateTime) {
-                return $this->grammar->parameterize($binding->format('Y-m-d H:i:s'));
-            }
-
-            if (is_string($binding) || is_object($binding) && method_exists($binding, '__toString')) {
-                return $this->grammar->parameterize((string) $binding);
-            }
-
-            if (is_bool($binding)) {
-                return $binding ? 1 : 0;
-            }
-
-            if ($binding === null) {
-                return 'NULL';
-            }
-
-            return $binding;
-        }, $bindings);
+        return array_map([$this->converter, 'handle'], $bindings);
     }
 }

@@ -3,6 +3,7 @@
 namespace Recca0120\EloquentDumper\Tests;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Expression;
 use Recca0120\EloquentDumper\Dumper;
 
 class DumperTest extends TestCase
@@ -34,6 +35,36 @@ class DumperTest extends TestCase
     }
 
     /**
+     * @dataProvider whereRawProvider
+     * @param Builder $query
+     * @param string $expected
+     */
+    public function test_it_should_get_where_raw_sql(Builder $query, $expected)
+    {
+        $dumper = $this->givenDumper();
+        $grammar = $query->getGrammar();
+
+        $query->from('users')->whereRaw('? = ? and ? = ?', [
+            new Expression($grammar->wrap('name')),
+            'foo',
+            new Expression($grammar->wrap('password')),
+            'bar',
+        ]);
+
+        $this->assertSql($expected, $dumper, $query);
+    }
+
+    public function whereRawProvider()
+    {
+        return [
+            [$this->mysql(), 'select * from `users` where `name` = \'foo\' and `password` = \'bar\''],
+            [$this->sqlite(), 'select * from "users" where "name" = \'foo\' and "password" = \'bar\''],
+            [$this->postgres(), 'select * from "users" where "name" = \'foo\' and "password" = \'bar\''],
+            [$this->sqlServer(), 'select * from [users] where [name] = \'foo\' and [password] = \'bar\''],
+        ];
+    }
+
+    /**
      * @dataProvider inProvider
      * @param Builder $query
      * @param string $expected
@@ -42,7 +73,7 @@ class DumperTest extends TestCase
     {
         $dumper = $this->givenDumper();
 
-        $query->from('users')->whereIn('id', [1, null, false, 'foo']);
+        $query->from('users')->whereIn('id', [new Expression(1), null, false, 'foo']);
 
         $this->assertSql($expected, $dumper, $query);
     }
