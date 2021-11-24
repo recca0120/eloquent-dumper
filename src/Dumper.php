@@ -9,7 +9,7 @@ use Recca0120\EloquentDumper\Grammars\PdoGrammar;
 
 class Dumper
 {
-    const NONE = 'none';
+    const DEFAULT = 'default';
     const PDO = 'pdo';
     const MYSQL = 'mysql';
     const SQLITE = 'sqlite';
@@ -18,13 +18,14 @@ class Dumper
     const SQLSERVER = 'sqlserver';
     const SQLSRV = 'sqlsrv';
     const MSSQL = 'mssql';
+    const NONE = 'none';
 
     /**
-     * @var Grammar
+     * @var Grammar|null
      */
     private $grammar;
     /**
-     * @var Converter
+     * @var Converter|null
      */
     private $converter;
 
@@ -32,7 +33,7 @@ class Dumper
      * Dumper constructor.
      * @param string $grammar
      */
-    public function __construct($grammar = self::PDO)
+    public function __construct(string $grammar = self::PDO)
     {
         $this->setGrammar($grammar);
     }
@@ -41,7 +42,7 @@ class Dumper
      * @param PDO $pdo
      * @return $this
      */
-    public function setPdo(PDO $pdo)
+    public function setPdo(PDO $pdo): Dumper
     {
         PdoGrammar::setPdo($pdo);
 
@@ -52,7 +53,7 @@ class Dumper
      * @param string $grammar
      * @return $this
      */
-    public function setGrammar($grammar)
+    public function setGrammar(string $grammar): Dumper
     {
         $this->grammar = Grammar::factory($grammar);
         $this->converter = new Converter($this->grammar);
@@ -63,9 +64,10 @@ class Dumper
     /**
      * @param string $sql
      * @param array $bindings
+     * @param bool $format
      * @return string
      */
-    public function dump($sql, $bindings, $format = true)
+    public function dump(string $sql, array $bindings, bool $format = true): string
     {
         $raw = $this->bindValues($sql, $bindings);
 
@@ -76,7 +78,7 @@ class Dumper
      * @param string $sql
      * @return string
      */
-    private function format($sql)
+    private function format(string $sql): string
     {
         return Formatter::format($sql);
     }
@@ -86,7 +88,7 @@ class Dumper
      * @param array $bindings
      * @return string
      */
-    private function bindValues($sql, $bindings)
+    private function bindValues(string $sql, array $bindings): string
     {
         return vsprintf(
             str_replace(['%', '?'], ['%%', '%s'], $this->grammar->columnize($sql)),

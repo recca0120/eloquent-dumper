@@ -23,8 +23,8 @@ class Converter
     }
 
     /**
-     * @param $binding
-     * @return int|string
+     * @param mixed $binding
+     * @return mixed
      */
     public function handle($binding)
     {

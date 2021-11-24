@@ -13,7 +13,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_get_simple_sql(Builder $query, $expected)
+    public function test_it_should_get_simple_sql(Builder $query, string $expected)
     {
         $dumper = $this->givenDumper();
 
@@ -24,7 +24,7 @@ class DumperTest extends TestCase
         $this->assertSql($expected, $dumper, $query);
     }
 
-    public function simpleProvider()
+    public function simpleProvider(): array
     {
         return [
             [$this->mysql(), 'select * from `users` where `name` = \'foo\' and `password` = \'bar\''],
@@ -39,7 +39,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_get_where_raw_sql(Builder $query, $expected)
+    public function test_it_should_get_where_raw_sql(Builder $query, string $expected)
     {
         $dumper = $this->givenDumper();
         $grammar = $query->getGrammar();
@@ -54,7 +54,7 @@ class DumperTest extends TestCase
         $this->assertSql($expected, $dumper, $query);
     }
 
-    public function whereRawProvider()
+    public function whereRawProvider(): array
     {
         return [
             [$this->mysql(), 'select * from `users` where `name` = \'foo\' and `password` = \'bar\''],
@@ -69,7 +69,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_get_condition_in_sql(Builder $query, $expected)
+    public function test_it_should_get_condition_in_sql(Builder $query, string $expected)
     {
         $dumper = $this->givenDumper();
 
@@ -78,7 +78,7 @@ class DumperTest extends TestCase
         $this->assertSql($expected, $dumper, $query);
     }
 
-    public function inProvider()
+    public function inProvider(): array
     {
         return [
             [$this->mysql(), 'select * from `users` where `id` in (1, NULL, 0, \'foo\')'],
@@ -93,7 +93,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_convert_to_none_quote_sql(Builder $query, $expected)
+    public function test_it_should_convert_to_none_quote_sql(Builder $query, string $expected)
     {
         $dumper = $this->givenDumper(Dumper::NONE);
 
@@ -102,7 +102,7 @@ class DumperTest extends TestCase
         $this->assertSql($expected, $dumper, $query);
     }
 
-    public function noneGrammarProvider()
+    public function noneGrammarProvider(): array
     {
         return [
             [$this->mysql(), 'select * from users where id in (1, NULL, 0, \'foo\')'],
@@ -117,7 +117,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_convert_to_mysql_version_sql(Builder $query, $expected)
+    public function test_it_should_convert_to_mysql_version_sql(Builder $query, string $expected)
     {
         $dumper = $this->givenDumper(Dumper::MYSQL);
 
@@ -126,7 +126,7 @@ class DumperTest extends TestCase
         $this->assertSql($expected, $dumper, $query);
     }
 
-    public function mySQLGrammarProvider()
+    public function mySQLGrammarProvider(): array
     {
         return [
             [$this->mysql(), 'select * from `users` where `id` in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\\\'t be late\')'],
@@ -141,7 +141,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_convert_to_sqlite_version_sql(Builder $query, $expected)
+    public function test_it_should_convert_to_sqlite_version_sql(Builder $query, string $expected)
     {
         $dumper = $this->givenDumper(Dumper::SQLITE);
 
@@ -150,7 +150,7 @@ class DumperTest extends TestCase
         $this->assertSql($expected, $dumper, $query);
     }
 
-    public function sqliteGrammarProvider()
+    public function sqliteGrammarProvider(): array
     {
         return [
             [$this->mysql(), 'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\User\', \'don\'\'t be late\')'],
@@ -165,7 +165,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_convert_to_postgres_version_sql(Builder $query, $expected)
+    public function test_it_should_convert_to_postgres_version_sql(Builder $query, string $expected)
     {
         $dumper = $this->givenDumper(Dumper::POSTGRES);
 
@@ -174,7 +174,7 @@ class DumperTest extends TestCase
         $this->assertSql($expected, $dumper, $query);
     }
 
-    public function postgresGrammarProvider()
+    public function postgresGrammarProvider(): array
     {
         return [
             [$this->mysql(), 'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\'\'t be late\')'],
@@ -189,7 +189,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_convert_to_sqlserver_version_sql(Builder $query, $expected)
+    public function test_it_should_convert_to_sqlserver_version_sql(Builder $query, string $expected)
     {
         $dumper = $this->givenDumper(Dumper::SQLSERVER);
 
@@ -198,7 +198,7 @@ class DumperTest extends TestCase
         $this->assertSql($expected, $dumper, $query);
     }
 
-    public function sqlServerGrammarProvider()
+    public function sqlServerGrammarProvider(): array
     {
         return [
             [$this->mysql(), 'select * from [users] where [id] in (1, 2, 3, 4, 5)'],
@@ -213,7 +213,7 @@ class DumperTest extends TestCase
      * @param Dumper $dumper
      * @param Builder $query
      */
-    private function assertSql($expected, Dumper $dumper, Builder $query)
+    private function assertSql(string $expected, Dumper $dumper, Builder $query)
     {
         self::assertEquals(
             $expected,

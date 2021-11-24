@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\DB;
 class EloquentHelper
 {
     /**
+     * @var callable|null
+     */
+    private static $dumpFunction;
+    /**
      * @var Dumper
      */
     private $dumper;
@@ -30,9 +34,10 @@ class EloquentHelper
 
     /**
      * @param QueryBuilder|Builder $query
+     * @param bool $format
      * @return string
      */
-    public function toRawSql($query, $format = false)
+    public function toRawSql($query, bool $format = false): string
     {
         $this->dumper->setPdo($query->getConnection()->getPdo());
 
@@ -53,12 +58,12 @@ class EloquentHelper
             return $query;
         }
 
-        function_exists('dump') ? dump($sql) : var_dump($sql);
+        self::dump($sql);
 
         return $query;
     }
 
-    public function getRawQueryLog($logs = [])
+    public function getRawQueryLog(array $logs = []): array
     {
         return array_map(function ($log) {
             return [
@@ -66,5 +71,19 @@ class EloquentHelper
                 'time' => $log['time'],
             ];
         }, empty($logs) ? DB::getQueryLog() : $logs);
+    }
+
+    public static function setDumpFunction(callable $dumpFunction)
+    {
+        self::$dumpFunction = $dumpFunction;
+    }
+
+    private static function dump(string $sql)
+    {
+        if (! self::$dumpFunction) {
+            self::$dumpFunction = function_exists('dump') ? 'dump' : 'var_dump';
+        }
+
+        call_user_func(self::$dumpFunction, $sql);
     }
 }

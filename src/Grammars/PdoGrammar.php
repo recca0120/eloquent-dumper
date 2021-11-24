@@ -9,7 +9,7 @@ class PdoGrammar extends Grammar
     /**
      * @var PDO|null
      */
-    public static $pdo = null;
+    public static $pdo;
 
     public static function setPdo(PDO $pdo)
     {
@@ -20,7 +20,7 @@ class PdoGrammar extends Grammar
      * @param string $sql
      * @return string
      */
-    public function columnize($sql)
+    public function columnize(string $sql): string
     {
         return $sql;
     }
@@ -29,7 +29,7 @@ class PdoGrammar extends Grammar
      * @param string $value
      * @return string
      */
-    public function parameterize($value)
+    public function parameterize(string $value): string
     {
         return self::$pdo ? static::$pdo->quote($value) : parent::parameterize(addslashes($value));
     }

@@ -8,7 +8,7 @@ class SqlServerGrammar extends Grammar
      * @param string $sql
      * @return string
      */
-    public function columnize($sql)
+    public function columnize(string $sql): string
     {
         return $this->replaceColumnQuotedIdentifiers($sql, ['[', ']']);
     }

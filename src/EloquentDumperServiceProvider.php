@@ -20,9 +20,9 @@ class EloquentDumperServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/eloquent-dumper.php', 'eloquent-dumper');
 
         $this->app->singleton(Dumper::class, function ($app) {
-            return new Dumper(
-                Arr::get($app['config'], 'eloquent-dumper.grammar', Dumper::PDO)
-            );
+            $grammar = Arr::get($app['config'], 'eloquent-dumper.grammar', Dumper::PDO);
+
+            return new Dumper($grammar);
         });
 
         $this->app->singleton(EloquentHelper::class, EloquentHelper::class);
@@ -50,7 +50,7 @@ class EloquentDumperServiceProvider extends ServiceProvider
         }
     }
 
-    private function registerBuilderMicro(string $method, Closure $closure)
+    private function registerBuilderMicro($method, Closure $closure)
     {
         Builder::macro($method, $closure);
         EloquentBuilder::macro($method, $closure);

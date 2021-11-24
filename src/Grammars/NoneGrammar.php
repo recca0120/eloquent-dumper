@@ -8,7 +8,7 @@ class NoneGrammar extends Grammar
      * @param string $sql
      * @return string
      */
-    public function columnize($sql)
+    public function columnize(string $sql): string
     {
         return $this->replaceColumnQuotedIdentifiers($sql, ['', '']);
     }
@@ -17,7 +17,7 @@ class NoneGrammar extends Grammar
      * @param string $value
      * @return string
      */
-    public function parameterize($value)
+    public function parameterize(string $value): string
     {
         return $this->quoteString($value);
     }

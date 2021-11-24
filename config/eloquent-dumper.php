@@ -2,7 +2,7 @@
 
 return [
     /*
-     * Supported: "pdo", "mysql", "sqlite", "pgsql", "sqlsrv"
+     * Supported: "default", "mysql", "sqlite", "pgsql", "sqlsrv"
      */
-    'grammar' => env('ELOQUENT_DUMPER_GRAMMAR', 'pdo'),
+    'grammar' => env('ELOQUENT_DUMPER_GRAMMAR', 'default'),
 ];

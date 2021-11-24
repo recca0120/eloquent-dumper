@@ -8,7 +8,7 @@ class MySqlGrammar extends Grammar
      * @param string $sql
      * @return string
      */
-    public function columnize($sql)
+    public function columnize(string $sql): string
     {
         return $this->replaceColumnQuotedIdentifiers($sql, ['`', '`']);
     }
@@ -17,7 +17,7 @@ class MySqlGrammar extends Grammar
      * @param string $value
      * @return string
      */
-    protected function escape($value)
+    protected function escape(string $value): string
     {
         $search = ['\\', "\x00", "\n", "\r", "'", '"', "\x1a"];
         $replace = ['\\\\', '\\0', '\\n', '\\r', "\'", '\"', '\\Z'];
