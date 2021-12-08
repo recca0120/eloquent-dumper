@@ -2,38 +2,24 @@
 
 namespace Recca0120\EloquentDumper;
 
+use DateTime;
+use Illuminate\Database\Query\Expression;
 use PDO;
 use PhpMyAdmin\SqlParser\Utils\Formatter;
 use Recca0120\EloquentDumper\Grammars\Grammar;
-use Recca0120\EloquentDumper\Grammars\PdoGrammar;
 
 class Dumper
 {
-    public const DEFAULT = 'default';
-    public const PDO = 'pdo';
-    public const MYSQL = 'mysql';
-    public const SQLITE = 'sqlite';
-    public const POSTGRES = 'postgres';
-    public const PGSQL = 'pgsql';
-    public const SQLSERVER = 'sqlserver';
-    public const SQLSRV = 'sqlsrv';
-    public const MSSQL = 'mssql';
-    public const NONE = 'none';
-
     /**
      * @var Grammar|null
      */
     private $grammar;
-    /**
-     * @var Converter|null
-     */
-    private $converter;
 
     /**
      * Dumper constructor.
      * @param string $grammar
      */
-    public function __construct(string $grammar = self::PDO)
+    public function __construct(string $grammar = Grammar::PDO)
     {
         $this->setGrammar($grammar);
     }
@@ -44,19 +30,18 @@ class Dumper
      */
     public function setPdo(PDO $pdo): self
     {
-        PdoGrammar::setPdo($pdo);
+        Grammar::setPdo($pdo);
 
         return $this;
     }
 
     /**
-     * @param string $grammar
+     * @param string|null $grammar
      * @return Dumper
      */
-    public function setGrammar(string $grammar): self
+    public function setGrammar(?string $grammar): self
     {
         $this->grammar = Grammar::factory($grammar);
-        $this->converter = new Converter($this->grammar);
 
         return $this;
     }
@@ -67,20 +52,11 @@ class Dumper
      * @param bool $format
      * @return string
      */
-    public function dump(string $sql, array $bindings, bool $format = true): string
+    public function dump(string $sql, array $bindings, bool $format = false): string
     {
         $raw = $this->bindValues($sql, $bindings);
 
-        return $format ? $this->format($raw) : $raw;
-    }
-
-    /**
-     * @param string $sql
-     * @return string
-     */
-    private function format(string $sql): string
-    {
-        return Formatter::format($sql);
+        return $format ? Formatter::format($raw) : $raw;
     }
 
     /**
@@ -92,7 +68,38 @@ class Dumper
     {
         return vsprintf(
             str_replace(['%', '?'], ['%%', '%s'], $this->grammar->columnize($sql)),
-            array_map([$this->converter, 'handle'], $bindings)
+            array_map([$this, 'toValue'], $bindings)
         );
+    }
+
+    /**
+     * @param mixed $binding
+     * @return string|int
+     */
+    private function toValue($binding)
+    {
+        if (is_array($binding)) {
+            return implode(', ', array_map(function ($value) {
+                return $this->toValue($value);
+            }, $binding));
+        }
+
+        if ($binding instanceof DateTime) {
+            return $this->grammar->parameterize($binding->format('Y-m-d H:i:s'));
+        }
+
+        if (is_a($binding, Expression::class)) {
+            return (string) $binding;
+        }
+
+        if (is_string($binding) || (is_object($binding) && method_exists($binding, '__toString'))) {
+            return $this->grammar->parameterize((string) $binding);
+        }
+
+        if (is_bool($binding)) {
+            return $binding ? 1 : 0;
+        }
+
+        return $binding ?: 'NULL';
     }
 }

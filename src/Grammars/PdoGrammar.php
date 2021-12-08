@@ -2,20 +2,8 @@
 
 namespace Recca0120\EloquentDumper\Grammars;
 
-use PDO;
-
 class PdoGrammar extends Grammar
 {
-    /**
-     * @var PDO|null
-     */
-    public static $pdo;
-
-    public static function setPdo(PDO $pdo)
-    {
-        self::$pdo = $pdo;
-    }
-
     /**
      * @param string $sql
      * @return string
@@ -31,6 +19,6 @@ class PdoGrammar extends Grammar
      */
     public function parameterize(string $value): string
     {
-        return self::$pdo ? static::$pdo->quote($value) : parent::parameterize(addslashes($value));
+        return self::$pdo ? self::$pdo->quote($value) : parent::parameterize(addslashes($value));
     }
 }

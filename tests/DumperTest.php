@@ -5,6 +5,7 @@ namespace Recca0120\EloquentDumper\Tests;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Recca0120\EloquentDumper\Dumper;
+use Recca0120\EloquentDumper\Grammars\Grammar;
 
 class DumperTest extends TestCase
 {
@@ -26,12 +27,19 @@ class DumperTest extends TestCase
 
     public function simpleProvider(): array
     {
-        return [
-            [$this->mysql(), 'select * from `users` where `name` = \'foo\' and `password` = \'bar\''],
-            [$this->sqlite(), 'select * from "users" where "name" = \'foo\' and "password" = \'bar\''],
-            [$this->postgres(), 'select * from "users" where "name" = \'foo\' and "password" = \'bar\''],
-            [$this->sqlServer(), 'select * from [users] where [name] = \'foo\' and [password] = \'bar\''],
-        ];
+        return [[
+            $this->mysql(),
+            'select * from `users` where `name` = \'foo\' and `password` = \'bar\'',
+        ], [
+            $this->sqlite(),
+            'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
+        ], [
+            $this->postgres(),
+            'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
+        ], [
+            $this->sqlServer(),
+            'select * from [users] where [name] = \'foo\' and [password] = \'bar\'',
+        ]];
     }
 
     /**
@@ -56,12 +64,19 @@ class DumperTest extends TestCase
 
     public function whereRawProvider(): array
     {
-        return [
-            [$this->mysql(), 'select * from `users` where `name` = \'foo\' and `password` = \'bar\''],
-            [$this->sqlite(), 'select * from "users" where "name" = \'foo\' and "password" = \'bar\''],
-            [$this->postgres(), 'select * from "users" where "name" = \'foo\' and "password" = \'bar\''],
-            [$this->sqlServer(), 'select * from [users] where [name] = \'foo\' and [password] = \'bar\''],
-        ];
+        return [[
+            $this->mysql(),
+            'select * from `users` where `name` = \'foo\' and `password` = \'bar\'',
+        ], [
+            $this->sqlite(),
+            'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
+        ], [
+            $this->postgres(),
+            'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
+        ], [
+            $this->sqlServer(),
+            'select * from [users] where [name] = \'foo\' and [password] = \'bar\'',
+        ]];
     }
 
     /**
@@ -80,12 +95,19 @@ class DumperTest extends TestCase
 
     public function inProvider(): array
     {
-        return [
-            [$this->mysql(), 'select * from `users` where `id` in (1, NULL, 0, \'foo\')'],
-            [$this->sqlite(), 'select * from "users" where "id" in (1, NULL, 0, \'foo\')'],
-            [$this->postgres(), 'select * from "users" where "id" in (1, NULL, 0, \'foo\')'],
-            [$this->sqlServer(), 'select * from [users] where [id] in (1, NULL, 0, \'foo\')'],
-        ];
+        return [[
+            $this->mysql(),
+            'select * from `users` where `id` in (1, NULL, 0, \'foo\')',
+        ], [
+            $this->sqlite(),
+            'select * from "users" where "id" in (1, NULL, 0, \'foo\')',
+        ], [
+            $this->postgres(),
+            'select * from "users" where "id" in (1, NULL, 0, \'foo\')',
+        ], [
+            $this->sqlServer(),
+            'select * from [users] where [id] in (1, NULL, 0, \'foo\')',
+        ]];
     }
 
     /**
@@ -95,7 +117,7 @@ class DumperTest extends TestCase
      */
     public function test_it_should_convert_to_none_quote_sql(Builder $query, string $expected): void
     {
-        $dumper = $this->givenDumper(Dumper::NONE);
+        $dumper = $this->givenDumper(Grammar::NONE);
 
         $query->from('users')->whereIn('id', [1, null, false, 'foo']);
 
@@ -104,12 +126,19 @@ class DumperTest extends TestCase
 
     public function noneGrammarProvider(): array
     {
-        return [
-            [$this->mysql(), 'select * from users where id in (1, NULL, 0, \'foo\')'],
-            [$this->sqlite(), 'select * from users where id in (1, NULL, 0, \'foo\')'],
-            [$this->postgres(), 'select * from users where id in (1, NULL, 0, \'foo\')'],
-            [$this->sqlServer(), 'select * from users where id in (1, NULL, 0, \'foo\')'],
-        ];
+        return [[
+            $this->mysql(),
+            'select * from users where id in (1, NULL, 0, \'foo\')',
+        ], [
+            $this->sqlite(),
+            'select * from users where id in (1, NULL, 0, \'foo\')',
+        ], [
+            $this->postgres(),
+            'select * from users where id in (1, NULL, 0, \'foo\')',
+        ], [
+            $this->sqlServer(),
+            'select * from users where id in (1, NULL, 0, \'foo\')',
+        ]];
     }
 
     /**
@@ -119,7 +148,7 @@ class DumperTest extends TestCase
      */
     public function test_it_should_convert_to_mysql_version_sql(Builder $query, string $expected): void
     {
-        $dumper = $this->givenDumper(Dumper::MYSQL);
+        $dumper = $this->givenDumper(Grammar::MYSQL);
 
         $query->from('users')->whereIn('id', [1, null, false, 'foo', 'App\User', 'don\'t be late']);
 
@@ -128,12 +157,19 @@ class DumperTest extends TestCase
 
     public function mySQLGrammarProvider(): array
     {
-        return [
-            [$this->mysql(), 'select * from `users` where `id` in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\\\'t be late\')'],
-            [$this->sqlite(), 'select * from `users` where `id` in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\\\'t be late\')'],
-            [$this->postgres(), 'select * from `users` where `id` in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\\\'t be late\')'],
-            [$this->sqlServer(), 'select * from `users` where `id` in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\\\'t be late\')'],
-        ];
+        return [[
+            $this->mysql(),
+            'select * from `users` where `id` in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\\\'t be late\')',
+        ], [
+            $this->sqlite(),
+            'select * from `users` where `id` in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\\\'t be late\')',
+        ], [
+            $this->postgres(),
+            'select * from `users` where `id` in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\\\'t be late\')',
+        ], [
+            $this->sqlServer(),
+            'select * from `users` where `id` in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\\\'t be late\')',
+        ]];
     }
 
     /**
@@ -143,7 +179,7 @@ class DumperTest extends TestCase
      */
     public function test_it_should_convert_to_sqlite_version_sql(Builder $query, string $expected): void
     {
-        $dumper = $this->givenDumper(Dumper::SQLITE);
+        $dumper = $this->givenDumper(Grammar::SQLITE);
 
         $query->from('users')->whereIn('id', [1, null, false, 'foo', 'App\User', 'don\'t be late']);
 
@@ -152,12 +188,19 @@ class DumperTest extends TestCase
 
     public function sqliteGrammarProvider(): array
     {
-        return [
-            [$this->mysql(), 'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\User\', \'don\'\'t be late\')'],
-            [$this->sqlite(), 'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\User\', \'don\'\'t be late\')'],
-            [$this->postgres(), 'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\User\', \'don\'\'t be late\')'],
-            [$this->sqlServer(), 'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\User\', \'don\'\'t be late\')'],
-        ];
+        return [[
+            $this->mysql(),
+            'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\User\', \'don\'\'t be late\')',
+        ], [
+            $this->sqlite(),
+            'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\User\', \'don\'\'t be late\')',
+        ], [
+            $this->postgres(),
+            'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\User\', \'don\'\'t be late\')',
+        ], [
+            $this->sqlServer(),
+            'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\User\', \'don\'\'t be late\')',
+        ]];
     }
 
     /**
@@ -167,7 +210,7 @@ class DumperTest extends TestCase
      */
     public function test_it_should_convert_to_postgres_version_sql(Builder $query, string $expected): void
     {
-        $dumper = $this->givenDumper(Dumper::POSTGRES);
+        $dumper = $this->givenDumper(Grammar::POSTGRES);
 
         $query->from('users')->whereIn('id', [1, null, false, 'foo', 'App\User', 'don\'t be late']);
 
@@ -176,12 +219,19 @@ class DumperTest extends TestCase
 
     public function postgresGrammarProvider(): array
     {
-        return [
-            [$this->mysql(), 'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\'\'t be late\')'],
-            [$this->sqlite(), 'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\'\'t be late\')'],
-            [$this->postgres(), 'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\'\'t be late\')'],
-            [$this->sqlServer(), 'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\'\'t be late\')'],
-        ];
+        return [[
+            $this->mysql(),
+            'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\'\'t be late\')',
+        ], [
+            $this->sqlite(),
+            'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\'\'t be late\')',
+        ], [
+            $this->postgres(),
+            'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\'\'t be late\')',
+        ], [
+            $this->sqlServer(),
+            'select * from "users" where "id" in (1, NULL, 0, \'foo\', \'App\\\\User\', \'don\'\'t be late\')',
+        ]];
     }
 
     /**
@@ -191,7 +241,7 @@ class DumperTest extends TestCase
      */
     public function test_it_should_convert_to_sqlserver_version_sql(Builder $query, string $expected): void
     {
-        $dumper = $this->givenDumper(Dumper::SQLSERVER);
+        $dumper = $this->givenDumper(Grammar::SQLSERVER);
 
         $query->from('users')->whereIn('id', [1, 2, 3, 4, 5]);
 
@@ -200,12 +250,19 @@ class DumperTest extends TestCase
 
     public function sqlServerGrammarProvider(): array
     {
-        return [
-            [$this->mysql(), 'select * from [users] where [id] in (1, 2, 3, 4, 5)'],
-            [$this->sqlite(), 'select * from [users] where [id] in (1, 2, 3, 4, 5)'],
-            [$this->postgres(), 'select * from [users] where [id] in (1, 2, 3, 4, 5)'],
-            [$this->sqlServer(), 'select * from [users] where [id] in (1, 2, 3, 4, 5)'],
-        ];
+        return [[
+            $this->mysql(),
+            'select * from [users] where [id] in (1, 2, 3, 4, 5)',
+        ], [
+            $this->sqlite(),
+            'select * from [users] where [id] in (1, 2, 3, 4, 5)',
+        ], [
+            $this->postgres(),
+            'select * from [users] where [id] in (1, 2, 3, 4, 5)',
+        ], [
+            $this->sqlServer(),
+            'select * from [users] where [id] in (1, 2, 3, 4, 5)',
+        ]];
     }
 
     /**

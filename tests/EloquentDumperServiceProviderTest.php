@@ -5,36 +5,65 @@ namespace Recca0120\EloquentDumper\Tests;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Orchestra\Testbench\TestCase;
+use org\bovigo\vfs\vfsStream;
 use Recca0120\EloquentDumper\EloquentDumperServiceProvider;
 
 class EloquentDumperServiceProviderTest extends TestCase
 {
-    public function setUp(): void
+    private $file;
+
+    protected function getEnvironmentSetUp($app)
     {
-        parent::setUp();
-        $this->app['config']->set('database.default', 'testing');
+        $root = vfsStream::setup();
+        $this->file = vfsStream::newFile('sql.log')->at($root);
+
+        $app['config']->set('database.default', 'testing');
+        $app['config']->set('logging.channels.eloquent-dumper.path', $this->file->url());
     }
 
     /**
-     * @dataProvider grammarProvider
+     * @dataProvider sqlProvider
      */
-    public function test_eloquent_dump_sql(string $grammar, string $excepted, string $exceptedOutput): void
+    public function test_dump_sql(string $grammar, string $excepted, string $exceptedOutput): void
     {
-        $this->app['config']->set('eloquent-dumper.grammar', $grammar);
-        $query = StubUser::where('name', 'foo')->where('password', 'bar');
+        $this->setGrammar($grammar);
+        $query = User::where('name', 'foo')->where('password', 'bar');
 
         self::assertEquals($excepted, $query->toRawSql());
         $this->assertOutput($exceptedOutput, $query);
     }
 
-    public function grammarProvider(): array
+    /**
+     * @dataProvider sqlProvider
+     */
+    public function test_log_sql(string $grammar, string $excepted): void
     {
-        return [
-            ['mysql', 'select * from `users` where `name` = \'foo\' and `password` = \'bar\'', 'SELECT * FROM `users` WHERE `name` = \'foo\' AND `password` = \'bar\''],
-            ['sqlite', 'select * from "users" where "name" = \'foo\' and "password" = \'bar\'', 'SELECT * FROM "users" WHERE "name" = \'foo\' AND "password" = \'bar\''],
-            ['pgsql', 'select * from "users" where "name" = \'foo\' and "password" = \'bar\'', 'SELECT * FROM "users" WHERE "name" = \'foo\' AND "password" = \'bar\''],
-            ['sqlsrv', 'select * from [users] where [name] = \'foo\' and [password] = \'bar\'', 'SELECT * FROM [ users ] WHERE [ NAME ] = \'foo\' AND [ PASSWORD ] = \'bar\''],
-        ];
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+        $this->setGrammar($grammar);
+        User::where('name', 'foo')->where('password', 'bar')->get();
+
+        self::assertStringContainsString($excepted, $this->file->getContent());
+    }
+
+    public function sqlProvider(): array
+    {
+        return [[
+            'mysql',
+            'select * from `users` where `name` = \'foo\' and `password` = \'bar\'',
+            'SELECT * FROM `users` WHERE `name` = \'foo\' AND `password` = \'bar\'',
+        ], [
+            'sqlite',
+            'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
+            'SELECT * FROM "users" WHERE "name" = \'foo\' AND "password" = \'bar\'',
+        ], [
+            'pgsql',
+            'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
+            'SELECT * FROM "users" WHERE "name" = \'foo\' AND "password" = \'bar\'',
+        ], [
+            'sqlsrv',
+            'select * from [users] where [name] = \'foo\' and [password] = \'bar\'',
+            'SELECT * FROM [ users ] WHERE [ NAME ] = \'foo\' AND [ PASSWORD ] = \'bar\'',
+        ]];
     }
 
     protected function getPackageProviders($app): array
@@ -57,9 +86,17 @@ class EloquentDumperServiceProviderTest extends TestCase
 
         self::assertEquals($expected, $output);
     }
+
+    /**
+     * @param string $grammar
+     * @return void
+     */
+    private function setGrammar(string $grammar): void
+    {
+        $this->app['config']->set('eloquent-dumper.grammar', $grammar);
+    }
 }
 
-class StubUser extends Model
+class User extends Model
 {
-    protected $table = 'users';
 }

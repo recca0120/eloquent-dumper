@@ -2,22 +2,47 @@
 
 namespace Recca0120\EloquentDumper\Grammars;
 
-use Recca0120\EloquentDumper\Dumper;
+use PDO;
 
 abstract class Grammar
 {
-    private static $lookup = [
-        Dumper::DEFAULT => PdoGrammar::class,
-        Dumper::PDO => PdoGrammar::class,
-        Dumper::MYSQL => MySqlGrammar::class,
-        Dumper::SQLITE => SQLiteGrammar::class,
-        Dumper::POSTGRES => PostgresGrammar::class,
-        Dumper::PGSQL => PostgresGrammar::class,
-        Dumper::SQLSERVER => SqlServerGrammar::class,
-        Dumper::SQLSRV => SqlServerGrammar::class,
-        Dumper::MSSQL => SqlServerGrammar::class,
-        Dumper::NONE => NoneGrammar::class,
+    public const DEFAULT = 'default';
+    public const PDO = 'pdo';
+    public const MYSQL = 'mysql';
+    public const SQLITE = 'sqlite';
+    public const POSTGRES = 'postgres';
+    public const PGSQL = 'pgsql';
+    public const SQLSERVER = 'sqlserver';
+    public const SQLSRV = 'sqlsrv';
+    public const MSSQL = 'mssql';
+    public const NONE = 'none';
+
+    private static $drivers = [
+        self::DEFAULT => PdoGrammar::class,
+        self::PDO => PdoGrammar::class,
+        self::MYSQL => MySqlGrammar::class,
+        self::SQLITE => SQLiteGrammar::class,
+        self::POSTGRES => PostgresGrammar::class,
+        self::PGSQL => PostgresGrammar::class,
+        self::SQLSERVER => SqlServerGrammar::class,
+        self::SQLSRV => SqlServerGrammar::class,
+        self::MSSQL => SqlServerGrammar::class,
+        self::NONE => NoneGrammar::class,
     ];
+
+    /**
+     * @var PDO|null
+     */
+    protected static $pdo;
+
+    /**
+     * @param PDO $pdo
+     * @return void
+     */
+    public static function setPdo(PDO $pdo): void
+    {
+        self::$pdo = $pdo;
+    }
 
     /**
      * @param string $sql
@@ -40,11 +65,9 @@ abstract class Grammar
      */
     public static function factory(?string $driver = null): self
     {
-        $driver = $driver !== null && array_key_exists(strtolower($driver), static::$lookup)
-            ? static::$lookup[strtolower($driver)]
-            : PdoGrammar::class;
+        $grammar = $driver !== null && array_key_exists(strtolower($driver), static::$drivers) ? static::$drivers[$driver] : PdoGrammar::class;
 
-        return new $driver();
+        return new $grammar();
     }
 
     /**
@@ -54,9 +77,9 @@ abstract class Grammar
      */
     protected function replaceColumnQuotedIdentifiers(string $sql, array $columnQuotedIdentifiers): string
     {
-        list($left, $right) = $columnQuotedIdentifiers;
+        [$left, $right] = $columnQuotedIdentifiers;
 
-        return preg_replace_callback('/[`"\[](?<column>[^`"\[\]]+)[`"\]]/', function ($matches) use ($right, $left) {
+        return preg_replace_callback('/[`"\[](?<column>[^`"\[\]]+)[`"\]]/', static function ($matches) use ($right, $left) {
             return ! empty($matches['column']) ? $left.$matches['column'].$right : $matches[0];
         }, $sql);
     }

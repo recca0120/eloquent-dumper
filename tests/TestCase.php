@@ -83,7 +83,7 @@ abstract class TestCase extends BaseCase
      */
     protected function givenDumper(?string $grammar = null): Dumper
     {
-        return (new Dumper())->setGrammar($grammar ?: Dumper::PDO);
+        return (new Dumper())->setGrammar($grammar);
     }
 
     /**
