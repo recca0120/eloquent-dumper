@@ -2,34 +2,23 @@
 
 namespace Recca0120\EloquentDumper;
 
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Support\Facades\DB;
 
 class EloquentHelper
 {
     /**
-     * @var callable|null
-     */
-    private static $dumpFunction;
-    /**
      * @var Dumper
      */
     private $dumper;
-    /**
-     * @var Application
-     */
-    private $app;
 
     /**
      * EloquentHelper constructor.
-     * @param Application $app
+     * @param Dumper $dumper
      */
-    public function __construct(Application $app)
+    public function __construct(Dumper $dumper)
     {
-        $this->app = $app;
-        $this->dumper = $app->get(Dumper::class);
+        $this->dumper = $dumper;
     }
 
     /**
@@ -48,11 +37,11 @@ class EloquentHelper
      * @param QueryBuilder|Builder $query
      * @return Builder|QueryBuilder
      */
-    public function dumpSql($query)
+    public function dumpSql($query, $runningInConsole = false)
     {
         $sql = $this->toRawSql($query, true);
 
-        if ($this->app->runningInConsole()) {
+        if ($runningInConsole) {
             echo "\n".$sql."\n";
 
             return $query;
@@ -63,27 +52,9 @@ class EloquentHelper
         return $query;
     }
 
-    public function getRawQueryLog(array $logs = []): array
+    private static function dump(string $sql): void
     {
-        return array_map(function ($log) {
-            return [
-                'query' => $this->dumper->dump($log['query'], $log['bindings'], false),
-                'time' => $log['time'],
-            ];
-        }, empty($logs) ? DB::getQueryLog() : $logs);
-    }
-
-    public static function setDumpFunction(callable $dumpFunction)
-    {
-        self::$dumpFunction = $dumpFunction;
-    }
-
-    private static function dump(string $sql)
-    {
-        if (! self::$dumpFunction) {
-            self::$dumpFunction = function_exists('dump') ? 'dump' : 'var_dump';
-        }
-
-        call_user_func(self::$dumpFunction, $sql);
+        $dump = function_exists('dump') ? 'dump' : 'var_dump';
+        $dump($sql);
     }
 }

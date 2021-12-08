@@ -25,14 +25,15 @@ class EloquentDumperServiceProvider extends ServiceProvider
             return new Dumper($grammar);
         });
 
-        $this->app->singleton(EloquentHelper::class, EloquentHelper::class);
-
         $this->registerBuilderMicro('toRawSql', function () {
             return app(EloquentHelper::class)->toRawSql($this);
         });
 
-        $this->registerBuilderMicro('dumpSql', function () {
-            return app(EloquentHelper::class)->dumpSql($this);
+        $runningInConsole = $this->app->runningInConsole();
+        $this->registerBuilderMicro('dumpSql', function () use ($runningInConsole) {
+            return app(EloquentHelper::class)->dumpSql(
+                $this, $runningInConsole
+            );
         });
     }
 

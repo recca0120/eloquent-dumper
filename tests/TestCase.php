@@ -2,18 +2,21 @@
 
 namespace Recca0120\EloquentDumper\Tests;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
+use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Query\Processors\SQLiteProcessor;
 use Illuminate\Database\Query\Processors\SqlServerProcessor;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase as BaseCase;
 use Recca0120\EloquentDumper\Dumper;
 
@@ -25,7 +28,7 @@ abstract class TestCase extends BaseCase
      * @param Builder $query
      * @return string
      */
-    protected function getDriver(Builder $query)
+    protected function getDriver(Builder $query): string
     {
         return get_class($query->getGrammar());
     }
@@ -33,57 +36,63 @@ abstract class TestCase extends BaseCase
     /**
      * @return Builder
      */
-    protected function mysql()
+    protected function mysql(): Builder
     {
-        $connection = m::mock(ConnectionInterface::class);
-        $connection->shouldReceive('getQueryGrammar')->andReturn(new MySqlGrammar());
-        $connection->shouldReceive('getPostProcessor')->andReturn(new MySqlProcessor());
-
-        return new Builder($connection);
+        return new Builder($this->mockConnection(
+            new MySqlGrammar(), new MySqlProcessor()
+        ));
     }
 
     /**
      * @return Builder
      */
-    protected function sqlite()
+    protected function sqlite(): Builder
     {
-        $connection = m::mock(ConnectionInterface::class);
-        $connection->shouldReceive('getQueryGrammar')->andReturn(new SqliteGrammar());
-        $connection->shouldReceive('getPostProcessor')->andReturn(new SqliteProcessor());
-
-        return new Builder($connection);
+        return new Builder($this->mockConnection(
+            new SqliteGrammar(), new SqliteProcessor()
+        ));
     }
 
     /**
      * @return Builder
      */
-    protected function sqlServer()
+    protected function sqlServer(): Builder
     {
-        $connection = m::mock(ConnectionInterface::class);
-        $connection->shouldReceive('getQueryGrammar')->andReturn(new SqlServerGrammar());
-        $connection->shouldReceive('getPostProcessor')->andReturn(new SqlServerProcessor());
-
-        return new Builder($connection);
+        return new Builder($this->mockConnection(
+            new SqlServerGrammar(), new SqlServerProcessor()
+        ));
     }
 
     /**
      * @return Builder
      */
-    protected function postgres()
+    protected function postgres(): Builder
     {
-        $connection = m::mock(ConnectionInterface::class);
-        $connection->shouldReceive('getQueryGrammar')->andReturn(new PostgresGrammar());
-        $connection->shouldReceive('getPostProcessor')->andReturn(new PostgresProcessor());
-
-        return new Builder($connection);
+        return new Builder($this->mockConnection(
+            new PostgresGrammar(), new PostgresProcessor()
+        ));
     }
 
     /**
      * @param string|null $grammar
      * @return Dumper
      */
-    protected function givenDumper($grammar = null)
+    protected function givenDumper(string $grammar = null): Dumper
     {
         return (new Dumper())->setGrammar($grammar ?: Dumper::PDO);
+    }
+
+    /**
+     * @param Grammar $grammar
+     * @param Processor $processor
+     * @return ConnectionInterface
+     */
+    private function mockConnection(Grammar $grammar, Processor $processor): ConnectionInterface
+    {
+        $connection = m::mock(Connection::class);
+        $connection->allows('getQueryGrammar')->andReturns($grammar);
+        $connection->allows('getPostProcessor')->andReturns($processor);
+
+        return $connection;
     }
 }

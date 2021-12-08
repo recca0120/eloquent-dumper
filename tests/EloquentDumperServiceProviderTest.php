@@ -4,15 +4,21 @@ namespace Recca0120\EloquentDumper\Tests;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Recca0120\EloquentDumper\EloquentDumperServiceProvider;
 use Orchestra\Testbench\TestCase;
+use Recca0120\EloquentDumper\EloquentDumperServiceProvider;
 
 class EloquentDumperServiceProviderTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->app['config']->set('database.default', 'testing');
+    }
+
     /**
      * @dataProvider grammarProvider
      */
-    public function test_eloquent_dump_sql(string $grammar, string $excepted, string $exceptedOutput)
+    public function test_eloquent_dump_sql(string $grammar, string $excepted, string $exceptedOutput): void
     {
         $this->app['config']->set('eloquent-dumper.grammar', $grammar);
         $query = StubUser::where('name', 'foo')->where('password', 'bar');

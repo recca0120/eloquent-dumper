@@ -13,7 +13,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_get_simple_sql(Builder $query, string $expected)
+    public function test_it_should_get_simple_sql(Builder $query, string $expected): void
     {
         $dumper = $this->givenDumper();
 
@@ -39,7 +39,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_get_where_raw_sql(Builder $query, string $expected)
+    public function test_it_should_get_where_raw_sql(Builder $query, string $expected): void
     {
         $dumper = $this->givenDumper();
         $grammar = $query->getGrammar();
@@ -69,7 +69,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_get_condition_in_sql(Builder $query, string $expected)
+    public function test_it_should_get_condition_in_sql(Builder $query, string $expected): void
     {
         $dumper = $this->givenDumper();
 
@@ -93,7 +93,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_convert_to_none_quote_sql(Builder $query, string $expected)
+    public function test_it_should_convert_to_none_quote_sql(Builder $query, string $expected): void
     {
         $dumper = $this->givenDumper(Dumper::NONE);
 
@@ -117,7 +117,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_convert_to_mysql_version_sql(Builder $query, string $expected)
+    public function test_it_should_convert_to_mysql_version_sql(Builder $query, string $expected): void
     {
         $dumper = $this->givenDumper(Dumper::MYSQL);
 
@@ -141,7 +141,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_convert_to_sqlite_version_sql(Builder $query, string $expected)
+    public function test_it_should_convert_to_sqlite_version_sql(Builder $query, string $expected): void
     {
         $dumper = $this->givenDumper(Dumper::SQLITE);
 
@@ -165,7 +165,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_convert_to_postgres_version_sql(Builder $query, string $expected)
+    public function test_it_should_convert_to_postgres_version_sql(Builder $query, string $expected): void
     {
         $dumper = $this->givenDumper(Dumper::POSTGRES);
 
@@ -189,7 +189,7 @@ class DumperTest extends TestCase
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_convert_to_sqlserver_version_sql(Builder $query, string $expected)
+    public function test_it_should_convert_to_sqlserver_version_sql(Builder $query, string $expected): void
     {
         $dumper = $this->givenDumper(Dumper::SQLSERVER);
 
@@ -213,7 +213,7 @@ class DumperTest extends TestCase
      * @param Dumper $dumper
      * @param Builder $query
      */
-    private function assertSql(string $expected, Dumper $dumper, Builder $query)
+    private function assertSql(string $expected, Dumper $dumper, Builder $query): void
     {
         self::assertEquals(
             $expected,
