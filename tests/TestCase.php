@@ -15,8 +15,8 @@ use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Query\Processors\SQLiteProcessor;
 use Illuminate\Database\Query\Processors\SqlServerProcessor;
-use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery as m;
 use PHPUnit\Framework\TestCase as BaseCase;
 use Recca0120\EloquentDumper\Dumper;
 
@@ -39,7 +39,8 @@ abstract class TestCase extends BaseCase
     protected function mysql(): Builder
     {
         return new Builder($this->mockConnection(
-            new MySqlGrammar(), new MySqlProcessor()
+            new MySqlGrammar(),
+            new MySqlProcessor()
         ));
     }
 
@@ -49,7 +50,8 @@ abstract class TestCase extends BaseCase
     protected function sqlite(): Builder
     {
         return new Builder($this->mockConnection(
-            new SqliteGrammar(), new SqliteProcessor()
+            new SqliteGrammar(),
+            new SqliteProcessor()
         ));
     }
 
@@ -59,7 +61,8 @@ abstract class TestCase extends BaseCase
     protected function sqlServer(): Builder
     {
         return new Builder($this->mockConnection(
-            new SqlServerGrammar(), new SqlServerProcessor()
+            new SqlServerGrammar(),
+            new SqlServerProcessor()
         ));
     }
 
@@ -69,7 +72,8 @@ abstract class TestCase extends BaseCase
     protected function postgres(): Builder
     {
         return new Builder($this->mockConnection(
-            new PostgresGrammar(), new PostgresProcessor()
+            new PostgresGrammar(),
+            new PostgresProcessor()
         ));
     }
 
@@ -77,7 +81,7 @@ abstract class TestCase extends BaseCase
      * @param string|null $grammar
      * @return Dumper
      */
-    protected function givenDumper(string $grammar = null): Dumper
+    protected function givenDumper(?string $grammar = null): Dumper
     {
         return (new Dumper())->setGrammar($grammar ?: Dumper::PDO);
     }

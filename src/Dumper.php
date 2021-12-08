@@ -9,16 +9,16 @@ use Recca0120\EloquentDumper\Grammars\PdoGrammar;
 
 class Dumper
 {
-    const DEFAULT = 'default';
-    const PDO = 'pdo';
-    const MYSQL = 'mysql';
-    const SQLITE = 'sqlite';
-    const POSTGRES = 'postgres';
-    const PGSQL = 'pgsql';
-    const SQLSERVER = 'sqlserver';
-    const SQLSRV = 'sqlsrv';
-    const MSSQL = 'mssql';
-    const NONE = 'none';
+    public const DEFAULT = 'default';
+    public const PDO = 'pdo';
+    public const MYSQL = 'mysql';
+    public const SQLITE = 'sqlite';
+    public const POSTGRES = 'postgres';
+    public const PGSQL = 'pgsql';
+    public const SQLSERVER = 'sqlserver';
+    public const SQLSRV = 'sqlsrv';
+    public const MSSQL = 'mssql';
+    public const NONE = 'none';
 
     /**
      * @var Grammar|null
@@ -40,9 +40,9 @@ class Dumper
 
     /**
      * @param PDO $pdo
-     * @return $this
+     * @return Dumper
      */
-    public function setPdo(PDO $pdo): Dumper
+    public function setPdo(PDO $pdo): self
     {
         PdoGrammar::setPdo($pdo);
 
@@ -51,9 +51,9 @@ class Dumper
 
     /**
      * @param string $grammar
-     * @return $this
+     * @return Dumper
      */
-    public function setGrammar(string $grammar): Dumper
+    public function setGrammar(string $grammar): self
     {
         $this->grammar = Grammar::factory($grammar);
         $this->converter = new Converter($this->grammar);

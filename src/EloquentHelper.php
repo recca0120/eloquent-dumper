@@ -4,6 +4,8 @@ namespace Recca0120\EloquentDumper;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Recca0120\EloquentDumper\Output\OutputInterface;
+use Recca0120\EloquentDumper\Output\VarDumpOutput;
 
 class EloquentHelper
 {
@@ -11,14 +13,19 @@ class EloquentHelper
      * @var Dumper
      */
     private $dumper;
+    /**
+     * @var OutputInterface
+     */
+    private $output;
 
     /**
-     * EloquentHelper constructor.
      * @param Dumper $dumper
+     * @param OutputInterface|null $output
      */
-    public function __construct(Dumper $dumper)
+    public function __construct(Dumper $dumper, ?OutputInterface $output = null)
     {
         $this->dumper = $dumper;
+        $this->output = $output ?: new VarDumpOutput();
     }
 
     /**
@@ -37,24 +44,10 @@ class EloquentHelper
      * @param QueryBuilder|Builder $query
      * @return Builder|QueryBuilder
      */
-    public function dumpSql($query, $runningInConsole = false)
+    public function dumpSql($query)
     {
-        $sql = $this->toRawSql($query, true);
-
-        if ($runningInConsole) {
-            echo "\n".$sql."\n";
-
-            return $query;
-        }
-
-        self::dump($sql);
+        $this->output->dump($this->toRawSql($query, true));
 
         return $query;
-    }
-
-    private static function dump(string $sql): void
-    {
-        $dump = function_exists('dump') ? 'dump' : 'var_dump';
-        $dump($sql);
     }
 }

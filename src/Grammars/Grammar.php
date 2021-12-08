@@ -38,7 +38,7 @@ abstract class Grammar
      * @param string|null $driver
      * @return Grammar
      */
-    public static function factory(string $driver = null): Grammar
+    public static function factory(?string $driver = null): self
     {
         $driver = $driver !== null && array_key_exists(strtolower($driver), static::$lookup)
             ? static::$lookup[strtolower($driver)]

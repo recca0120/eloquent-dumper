@@ -46,7 +46,7 @@ class EloquentDumperServiceProviderTest extends TestCase
      * @param string $expected
      * @param Builder $query
      */
-    private function assertOutput(string $expected, Builder $query)
+    private function assertOutput(string $expected, Builder $query): void
     {
         ob_start();
         $query->dumpSql();

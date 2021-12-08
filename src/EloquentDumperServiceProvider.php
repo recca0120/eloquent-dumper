@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
+use Recca0120\EloquentDumper\Output\ConsoleOutput;
+use Recca0120\EloquentDumper\Output\SymfonyDumpOutput;
 
 class EloquentDumperServiceProvider extends ServiceProvider
 {
@@ -25,15 +27,18 @@ class EloquentDumperServiceProvider extends ServiceProvider
             return new Dumper($grammar);
         });
 
+        $this->app->singleton(EloquentHelper::class, function () {
+            $output = $this->app->runningInConsole() ? new ConsoleOutput() : new SymfonyDumpOutput();
+
+            return new EloquentHelper($this->app[Dumper::class], $output);
+        });
+
         $this->registerBuilderMicro('toRawSql', function () {
             return app(EloquentHelper::class)->toRawSql($this);
         });
 
-        $runningInConsole = $this->app->runningInConsole();
-        $this->registerBuilderMicro('dumpSql', function () use ($runningInConsole) {
-            return app(EloquentHelper::class)->dumpSql(
-                $this, $runningInConsole
-            );
+        $this->registerBuilderMicro('dumpSql', function () {
+            return app(EloquentHelper::class)->dumpSql($this);
         });
     }
 
