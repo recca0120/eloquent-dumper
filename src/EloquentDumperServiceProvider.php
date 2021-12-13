@@ -59,26 +59,29 @@ class EloquentDumperServiceProvider extends ServiceProvider
             ], 'eloquent-dumper');
         }
 
-        $this->app['config']->set(
-            'logging.channels.eloquent-dumper',
-            $this->getConfig('logging.channel')
-        );
+        $channels = $this->getConfig('logging.channels');
+        foreach ($channels as $name => $channel) {
+            $name = 'logging.channels.eloquent-dumper-'.$name;
+            $this->app['config']->set($name, $channel);
+        }
 
-        DB::listen(function (QueryExecuted $event) {
+        $format = $this->getConfig('logging.format');
+
+        DB::listen(function (QueryExecuted $event) use ($format) {
             $request = app(Request::class);
             $sql = app(Dumper::class)
                 ->setPdo($event->connection->getPdo())
                 ->dump($event->sql, $event->bindings);
 
-            Log::channel('eloquent-dumper')->debug(
-                strtr($this->getConfig('logging.format'), [
-                    '%connection-name%' => $event->connectionName,
-                    '%time%' => static::formatDuration($event->time),
-                    '%sql%' => $sql,
-                    '%method%' => $request->method(),
-                    '%uri%' => $request->getRequestUri(),
-                ])
-            );
+            $attributes = [
+                '%connection-name%' => $event->connectionName,
+                '%time%' => static::formatDuration($event->time),
+                '%sql%' => $sql,
+                '%method%' => $request->method(),
+                '%uri%' => $request->getRequestUri(),
+            ];
+
+            Log::channel('eloquent-dumper-log')->debug(strtr($format, $attributes));
         });
     }
 

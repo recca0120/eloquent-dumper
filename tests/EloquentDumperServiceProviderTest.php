@@ -10,16 +10,18 @@ use Recca0120\EloquentDumper\EloquentDumperServiceProvider;
 
 class EloquentDumperServiceProviderTest extends TestCase
 {
-    private $file;
+    private $sqlFile;
 
     protected function getEnvironmentSetUp($app)
     {
         $root = vfsStream::setup();
-        $this->file = vfsStream::newFile('sql.log')->at($root);
+        $this->sqlFile = vfsStream::newFile('sql.log')->at($root);
+        $this->slowSqlFile = vfsStream::newFile('slow-sql.log')->at($root);
 
         $app['config']->set('database.default', 'testing');
-        $app['config']->set('eloquent-dumper.logging.channel.path', $this->file->url());
         $app['config']->set('eloquent-dumper.logging.format', '%connection-name% %sql% | %method%');
+        $app['config']->set('eloquent-dumper.logging.channels.log.path', $this->sqlFile->url());
+        $app['config']->set('eloquent-dumper.logging.channels.slow-sql.path', $this->slowSqlFile->url());
     }
 
     /**
@@ -45,7 +47,7 @@ class EloquentDumperServiceProviderTest extends TestCase
         $this->setGrammar($grammar);
         User::where('name', 'foo')->where('password', 'bar')->get();
 
-        self::assertStringContainsString('testing '.$excepted.' | GET', $this->file->getContent());
+        self::assertStringContainsString('testing '.$excepted.' | GET', $this->sqlFile->getContent());
     }
 
     public function sqlProvider(): array

@@ -75,7 +75,6 @@ abstract class Dumper
         return new $grammar();
     }
 
-
     /**
      * @param string $sql
      * @return string
