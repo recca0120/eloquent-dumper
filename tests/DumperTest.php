@@ -111,20 +111,20 @@ class DumperTest extends TestCase
     }
 
     /**
-     * @dataProvider noneGrammarProvider
+     * @dataProvider withoutQuoteGrammarProvider
      * @param Builder $query
      * @param string $expected
      */
-    public function test_it_should_convert_to_none_quote_sql(Builder $query, string $expected): void
+    public function test_it_should_convert_to_without_quote_sql(Builder $query, string $expected): void
     {
-        $dumper = $this->givenDumper(Grammar::NONE);
+        $dumper = $this->givenDumper(Grammar::WITHOUT_QUOTE);
 
         $query->from('users')->whereIn('id', [1, null, false, 'foo']);
 
         $this->assertSql($expected, $dumper, $query);
     }
 
-    public function noneGrammarProvider(): array
+    public function withoutQuoteGrammarProvider(): array
     {
         return [[
             $this->mysql(),

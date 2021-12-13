@@ -15,7 +15,7 @@ abstract class Grammar
     public const SQLSERVER = 'sqlserver';
     public const SQLSRV = 'sqlsrv';
     public const MSSQL = 'mssql';
-    public const NONE = 'none';
+    public const WITHOUT_QUOTE = 'none';
 
     private static $drivers = [
         self::DEFAULT => PdoGrammar::class,
@@ -27,7 +27,7 @@ abstract class Grammar
         self::SQLSERVER => SqlServerGrammar::class,
         self::SQLSRV => SqlServerGrammar::class,
         self::MSSQL => SqlServerGrammar::class,
-        self::NONE => NoneGrammar::class,
+        self::WITHOUT_QUOTE => WithoutQuoteGrammar::class,
     ];
 
     /**

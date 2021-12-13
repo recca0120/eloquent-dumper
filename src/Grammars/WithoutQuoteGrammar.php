@@ -2,7 +2,7 @@
 
 namespace Recca0120\EloquentDumper\Grammars;
 
-class NoneGrammar extends Grammar
+class WithoutQuoteGrammar extends Grammar
 {
     /**
      * @param string $sql
