@@ -1,14 +1,16 @@
 <?php
 
-namespace Recca0120\EloquentDumper\Grammars;
+namespace Recca0120\EloquentDumper\Dumpers;
 
-class WithoutQuoteGrammar extends Grammar
+use Recca0120\EloquentDumper\Dumper;
+
+class WithoutQuoteDumper extends Dumper
 {
     /**
      * @param string $sql
      * @return string
      */
-    public function columnize(string $sql): string
+    protected function columnize(string $sql): string
     {
         return $this->replaceColumnQuotedIdentifiers($sql, ['', '']);
     }
@@ -17,7 +19,7 @@ class WithoutQuoteGrammar extends Grammar
      * @param string $value
      * @return string
      */
-    public function parameterize(string $value): string
+    protected function parameterize(string $value): string
     {
         return $this->quoteString($value);
     }

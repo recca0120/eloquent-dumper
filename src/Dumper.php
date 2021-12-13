@@ -5,58 +5,121 @@ namespace Recca0120\EloquentDumper;
 use DateTime;
 use Illuminate\Database\Query\Expression;
 use PDO;
-use PhpMyAdmin\SqlParser\Utils\Formatter;
-use Recca0120\EloquentDumper\Grammars\Grammar;
+use Recca0120\EloquentDumper\Dumpers\MySqlDumper;
+use Recca0120\EloquentDumper\Dumpers\PdoDumper;
+use Recca0120\EloquentDumper\Dumpers\PostgresDumper;
+use Recca0120\EloquentDumper\Dumpers\SQLiteDumper;
+use Recca0120\EloquentDumper\Dumpers\SqlServerDumper;
+use Recca0120\EloquentDumper\Dumpers\WithoutQuoteDumper;
 
-class Dumper
+abstract class Dumper
 {
-    /**
-     * @var Grammar|null
-     */
-    private $grammar;
+    public const DEFAULT = 'default';
+    public const PDO = 'pdo';
+    public const MYSQL = 'mysql';
+    public const SQLITE = 'sqlite';
+    public const POSTGRES = 'postgres';
+    public const PGSQL = 'pgsql';
+    public const SQLSERVER = 'sqlserver';
+    public const SQLSRV = 'sqlsrv';
+    public const MSSQL = 'mssql';
+    public const WITHOUT_QUOTE = 'none';
+
+    private static $drivers = [
+        self::DEFAULT => PdoDumper::class,
+        self::PDO => PdoDumper::class,
+        self::MYSQL => MySqlDumper::class,
+        self::SQLITE => SQLiteDumper::class,
+        self::POSTGRES => PostgresDumper::class,
+        self::PGSQL => PostgresDumper::class,
+        self::SQLSERVER => SqlServerDumper::class,
+        self::SQLSRV => SqlServerDumper::class,
+        self::MSSQL => SqlServerDumper::class,
+        self::WITHOUT_QUOTE => WithoutQuoteDumper::class,
+    ];
 
     /**
-     * Dumper constructor.
-     * @param string $grammar
+     * @var PDO|null
      */
-    public function __construct(string $grammar = Grammar::PDO)
-    {
-        $this->setGrammar($grammar);
-    }
+    protected $pdo;
 
     /**
      * @param PDO $pdo
-     * @return Dumper
+     * @return self
      */
     public function setPdo(PDO $pdo): self
     {
-        Grammar::setPdo($pdo);
+        $this->pdo = $pdo;
 
         return $this;
     }
 
     /**
-     * @param string|null $grammar
+     * @param string|null $driver
      * @return Dumper
      */
-    public function setGrammar(?string $grammar): self
+    public static function factory(?string $driver = null): self
     {
-        $this->grammar = Grammar::factory($grammar);
+        $grammar = $driver !== null && array_key_exists(strtolower($driver), static::$drivers) ? static::$drivers[$driver] : PdoDumper::class;
 
-        return $this;
+        return new $grammar();
     }
 
     /**
      * @param string $sql
      * @param array $bindings
-     * @param bool $format
      * @return string
      */
-    public function dump(string $sql, array $bindings, bool $format = false): string
+    public function dump(string $sql, array $bindings): string
     {
-        $raw = $this->bindValues($sql, $bindings);
+        return $this->bindValues($sql, $bindings);
+    }
 
-        return $format ? Formatter::format($raw) : $raw;
+    /**
+     * @param string $sql
+     * @return string
+     */
+    abstract protected function columnize(string $sql): string;
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    protected function parameterize(string $value): string
+    {
+        return $this->quoteString($this->escape($value));
+    }
+
+    /**
+     * @param string $sql
+     * @param string[] $columnQuotedIdentifiers
+     * @return string
+     */
+    protected function replaceColumnQuotedIdentifiers(string $sql, array $columnQuotedIdentifiers): string
+    {
+        [$left, $right] = $columnQuotedIdentifiers;
+
+        return preg_replace_callback('/[`"\[](?<column>[^`"\[\]]+)[`"\]]/', static function ($matches) use ($right, $left) {
+            return ! empty($matches['column']) ? $left.$matches['column'].$right : $matches[0];
+        }, $sql);
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    protected function quoteString(string $value): string
+    {
+        return "'$value'";
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    protected function escape(string $value): string
+    {
+        return $value;
     }
 
     /**
@@ -67,7 +130,7 @@ class Dumper
     private function bindValues(string $sql, array $bindings): string
     {
         return vsprintf(
-            str_replace(['%', '?'], ['%%', '%s'], $this->grammar->columnize($sql)),
+            str_replace(['%', '?'], ['%%', '%s'], $this->columnize($sql)),
             array_map([$this, 'toValue'], $bindings)
         );
     }
@@ -85,7 +148,7 @@ class Dumper
         }
 
         if ($binding instanceof DateTime) {
-            return $this->grammar->parameterize($binding->format('Y-m-d H:i:s'));
+            return $this->parameterize($binding->format('Y-m-d H:i:s'));
         }
 
         if (is_a($binding, Expression::class)) {
@@ -93,7 +156,7 @@ class Dumper
         }
 
         if (is_string($binding) || (is_object($binding) && method_exists($binding, '__toString'))) {
-            return $this->grammar->parameterize((string) $binding);
+            return $this->parameterize((string) $binding);
         }
 
         if (is_bool($binding)) {

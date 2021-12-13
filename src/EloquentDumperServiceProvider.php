@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use PhpMyAdmin\SqlParser\Utils\Formatter;
 use Recca0120\EloquentDumper\Output\ConsoleOutput;
 use Recca0120\EloquentDumper\Output\OutputInterface;
 use Recca0120\EloquentDumper\Output\SymfonyDumpOutput;
@@ -26,7 +27,7 @@ class EloquentDumperServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/eloquent-dumper.php', 'eloquent-dumper');
 
         $this->app->bind(Dumper::class, function () {
-            return new Dumper($this->getConfig('grammar'));
+            return Dumper::factory($this->getConfig('grammar'));
         });
 
         $this->app->singleton(OutputInterface::class, function () {
@@ -46,11 +47,11 @@ class EloquentDumperServiceProvider extends ServiceProvider
             /** @var Builder $query */
             $query = $this;
 
-            return app(OutputInterface::class)->dump(
-                app(Dumper::class)
-                    ->setPdo($query->getConnection()->getPdo())
-                    ->dump($query->toSql(), $query->getBindings(), true)
-            );
+            $sql = app(Dumper::class)
+                ->setPdo($query->getConnection()->getPdo())
+                ->dump($query->toSql(), $query->getBindings());
+
+            return app(OutputInterface::class)->dump(Formatter::format($sql));
         });
     }
 

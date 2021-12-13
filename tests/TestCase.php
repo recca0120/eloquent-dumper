@@ -83,7 +83,7 @@ abstract class TestCase extends BaseCase
      */
     protected function givenDumper(?string $grammar = null): Dumper
     {
-        return (new Dumper())->setGrammar($grammar);
+        return Dumper::factory($grammar);
     }
 
     /**

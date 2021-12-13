@@ -5,7 +5,6 @@ namespace Recca0120\EloquentDumper\Tests;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Recca0120\EloquentDumper\Dumper;
-use Recca0120\EloquentDumper\Grammars\Grammar;
 
 class DumperTest extends TestCase
 {
@@ -117,7 +116,7 @@ class DumperTest extends TestCase
      */
     public function test_it_should_convert_to_without_quote_sql(Builder $query, string $expected): void
     {
-        $dumper = $this->givenDumper(Grammar::WITHOUT_QUOTE);
+        $dumper = $this->givenDumper(Dumper::WITHOUT_QUOTE);
 
         $query->from('users')->whereIn('id', [1, null, false, 'foo']);
 
@@ -148,7 +147,7 @@ class DumperTest extends TestCase
      */
     public function test_it_should_convert_to_mysql_version_sql(Builder $query, string $expected): void
     {
-        $dumper = $this->givenDumper(Grammar::MYSQL);
+        $dumper = $this->givenDumper(Dumper::MYSQL);
 
         $query->from('users')->whereIn('id', [1, null, false, 'foo', 'App\User', 'don\'t be late']);
 
@@ -179,7 +178,7 @@ class DumperTest extends TestCase
      */
     public function test_it_should_convert_to_sqlite_version_sql(Builder $query, string $expected): void
     {
-        $dumper = $this->givenDumper(Grammar::SQLITE);
+        $dumper = $this->givenDumper(Dumper::SQLITE);
 
         $query->from('users')->whereIn('id', [1, null, false, 'foo', 'App\User', 'don\'t be late']);
 
@@ -210,7 +209,7 @@ class DumperTest extends TestCase
      */
     public function test_it_should_convert_to_postgres_version_sql(Builder $query, string $expected): void
     {
-        $dumper = $this->givenDumper(Grammar::POSTGRES);
+        $dumper = $this->givenDumper(Dumper::POSTGRES);
 
         $query->from('users')->whereIn('id', [1, null, false, 'foo', 'App\User', 'don\'t be late']);
 
@@ -241,7 +240,7 @@ class DumperTest extends TestCase
      */
     public function test_it_should_convert_to_sqlserver_version_sql(Builder $query, string $expected): void
     {
-        $dumper = $this->givenDumper(Grammar::SQLSERVER);
+        $dumper = $this->givenDumper(Dumper::SQLSERVER);
 
         $query->from('users')->whereIn('id', [1, 2, 3, 4, 5]);
 

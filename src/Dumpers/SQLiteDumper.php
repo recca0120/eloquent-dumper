@@ -1,8 +1,8 @@
 <?php
 
-namespace Recca0120\EloquentDumper\Grammars;
+namespace Recca0120\EloquentDumper\Dumpers;
 
-class SQLiteGrammar extends PostgresGrammar
+class SQLiteDumper extends PostgresDumper
 {
     protected function escape(string $value): string
     {
