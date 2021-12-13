@@ -11,8 +11,8 @@
     "type": "library",
     "require": {
         "ext-pdo": "*",
-        "illuminate/database": "^5.8|^6.0|^7.0|^8.0",
-        "phpmyadmin/sql-parser": "^5.4"
+        "doctrine/sql-formatter": "^1.1",
+        "illuminate/database": "^5.8|^6.0|^7.0|^8.0"
     },
     "require-dev": {
         "mikey179/vfsstream": "^1.6",

@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
-use PhpMyAdmin\SqlParser\Utils\Formatter;
 use Recca0120\EloquentDumper\Output\ConsoleOutput;
 use Recca0120\EloquentDumper\Output\OutputInterface;
 use Recca0120\EloquentDumper\Output\SymfonyDumpOutput;
@@ -35,23 +34,15 @@ class EloquentDumperServiceProvider extends ServiceProvider
         });
 
         $this->registerBuilderMicro('toRawSql', function () {
-            /** @var Builder $query */
-            $query = $this;
-
             return app(Dumper::class)
-                ->setPdo($query->getConnection()->getPdo())
-                ->dump($query->toSql(), $query->getBindings());
+                ->setPdo($this->getConnection()->getPdo())
+                ->dump($this->toSql(), $this->getBindings());
         });
 
         $this->registerBuilderMicro('dumpSql', function () {
-            /** @var Builder $query */
-            $query = $this;
+            app(OutputInterface::class)->output($this->toRawSql());
 
-            $sql = app(Dumper::class)
-                ->setPdo($query->getConnection()->getPdo())
-                ->dump($query->toSql(), $query->getBindings());
-
-            return app(OutputInterface::class)->dump(Formatter::format($sql));
+            return $this;
         });
     }
 

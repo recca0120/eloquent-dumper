@@ -29,9 +29,11 @@ class EloquentDumperServiceProviderTest extends TestCase
     {
         $this->setGrammar($grammar);
         $query = User::where('name', 'foo')->where('password', 'bar');
+        $sql = $query->toRawSql();
+        $dumpSql = $this->dumpSql($query);
 
-        self::assertEquals($excepted, $query->toRawSql());
-        $this->assertOutput($exceptedOutput, $query);
+        self::assertEquals($excepted, $sql);
+        self::assertEquals($excepted, $dumpSql);
     }
 
     /**
@@ -43,10 +45,7 @@ class EloquentDumperServiceProviderTest extends TestCase
         $this->setGrammar($grammar);
         User::where('name', 'foo')->where('password', 'bar')->get();
 
-        self::assertStringContainsString(
-            'testing '.$excepted.' | GET',
-            $this->file->getContent()
-        );
+        self::assertStringContainsString('testing '.$excepted.' | GET', $this->file->getContent());
     }
 
     public function sqlProvider(): array
@@ -54,19 +53,19 @@ class EloquentDumperServiceProviderTest extends TestCase
         return [[
             'mysql',
             'select * from `users` where `name` = \'foo\' and `password` = \'bar\'',
-            'SELECT * FROM `users` WHERE `name` = \'foo\' AND `password` = \'bar\'',
+            'select * from `users` where `name` = \'foo\' and `password` = \'bar\'',
         ], [
             'sqlite',
             'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
-            'SELECT * FROM "users" WHERE "name" = \'foo\' AND "password" = \'bar\'',
+            'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
         ], [
             'pgsql',
             'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
-            'SELECT * FROM "users" WHERE "name" = \'foo\' AND "password" = \'bar\'',
+            'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
         ], [
             'sqlsrv',
             'select * from [users] where [name] = \'foo\' and [password] = \'bar\'',
-            'SELECT * FROM [ users ] WHERE [ NAME ] = \'foo\' AND [ PASSWORD ] = \'bar\'',
+            'select * from [users] where [name] = \'foo\' and [password] = \'bar\'',
         ]];
     }
 
@@ -76,28 +75,39 @@ class EloquentDumperServiceProviderTest extends TestCase
     }
 
     /**
-     * @param string $expected
-     * @param Builder $query
-     */
-    private function assertOutput(string $expected, Builder $query): void
-    {
-        ob_start();
-        $query->dumpSql();
-        $content = ob_get_clean();
-        $output = str_replace(["\x1b[35m", "\x1b[36m", "\x1b[39m", "\x1b[91m", "\x1b[92m", "\x1b[95m", "\x1b[0m"], '', $content);
-        $output = preg_replace('/\r\n|\n/', ' ', $output);
-        $output = trim(preg_replace('/\s+/', ' ', $output));
-
-        self::assertEquals($expected, $output);
-    }
-
-    /**
      * @param string $grammar
      * @return void
      */
     private function setGrammar(string $grammar): void
     {
         $this->app['config']->set('eloquent-dumper.grammar', $grammar);
+    }
+
+    /**
+     * @param Builder $query
+     * @return string
+     */
+    private function dumpSql(Builder $query): string
+    {
+        ob_start();
+        $query->dumpSql();
+        $output = ob_get_clean();
+        $output = str_replace([
+            "\x1b[35m",
+            "\x1b[36m",
+            "\x1b[39m",
+            "\x1b[91m",
+            "\x1b[92m",
+            "\x1b[95m",
+            "\x1b[0m",
+            "\e[0m",
+            "\e[34;1m",
+            "\e[35;1m",
+            "\e[37m",
+        ], '', $output);
+        $output = preg_replace('/\r\n|\n/', ' ', $output);
+
+        return trim(preg_replace('/\s+/', ' ', $output));
     }
 }
 

@@ -55,6 +55,16 @@ abstract class Dumper
     }
 
     /**
+     * @param string $sql
+     * @param array $bindings
+     * @return string
+     */
+    public function dump(string $sql, array $bindings): string
+    {
+        return $this->bindValues($sql, $bindings);
+    }
+
+    /**
      * @param string|null $driver
      * @return Dumper
      */
@@ -65,15 +75,6 @@ abstract class Dumper
         return new $grammar();
     }
 
-    /**
-     * @param string $sql
-     * @param array $bindings
-     * @return string
-     */
-    public function dump(string $sql, array $bindings): string
-    {
-        return $this->bindValues($sql, $bindings);
-    }
 
     /**
      * @param string $sql
