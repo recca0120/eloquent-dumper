@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
@@ -24,11 +25,8 @@ class EloquentDumperServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/eloquent-dumper.php', 'eloquent-dumper');
 
-        $config = $this->app['config'];
-        $config->set('logging.channels.eloquent-dumper', $config->get('eloquent-dumper.logging.channel'));
-
-        $this->app->bind(Dumper::class, function () use ($config) {
-            return new Dumper($config->get('eloquent-dumper.grammar'));
+        $this->app->bind(Dumper::class, function () {
+            return new Dumper($this->getConfig('grammar'));
         });
 
         $this->app->singleton(OutputInterface::class, function () {
@@ -69,15 +67,25 @@ class EloquentDumperServiceProvider extends ServiceProvider
             ], 'eloquent-dumper');
         }
 
+        $this->app['config']->set(
+            'logging.channels.eloquent-dumper',
+            $this->getConfig('logging.channel')
+        );
+
         DB::listen(function (QueryExecuted $event) {
-            $connectionName = $event->connectionName;
-            $time = static::formatDuration($event->time);
+            $request = app(Request::class);
             $sql = app(Dumper::class)
                 ->setPdo($event->connection->getPdo())
                 ->dump($event->sql, $event->bindings);
 
             Log::channel('eloquent-dumper')->debug(
-                vsprintf('[%s] [%s] %s', [$connectionName, $time, $sql])
+                strtr($this->getConfig('logging.format'), [
+                    '%connection-name%' => $event->connectionName,
+                    '%time%' => static::formatDuration($event->time),
+                    '%sql%' => $sql,
+                    '%method%' => $request->method(),
+                    '%uri%' => $request->getRequestUri(),
+                ])
             );
         });
     }
@@ -97,5 +105,14 @@ class EloquentDumperServiceProvider extends ServiceProvider
         return $time < 1
             ? round($time * 1000, 2).'ms'
             : round($time, 2).'s';
+    }
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    private function getConfig(string $name)
+    {
+        return $this->app['config']['eloquent-dumper.'.$name];
     }
 }

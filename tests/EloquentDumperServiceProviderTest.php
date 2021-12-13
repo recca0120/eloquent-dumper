@@ -18,7 +18,8 @@ class EloquentDumperServiceProviderTest extends TestCase
         $this->file = vfsStream::newFile('sql.log')->at($root);
 
         $app['config']->set('database.default', 'testing');
-        $app['config']->set('logging.channels.eloquent-dumper.path', $this->file->url());
+        $app['config']->set('eloquent-dumper.logging.channel.path', $this->file->url());
+        $app['config']->set('eloquent-dumper.logging.format', '%connection-name% %sql% | %method%');
     }
 
     /**
@@ -42,7 +43,10 @@ class EloquentDumperServiceProviderTest extends TestCase
         $this->setGrammar($grammar);
         User::where('name', 'foo')->where('password', 'bar')->get();
 
-        self::assertStringContainsString($excepted, $this->file->getContent());
+        self::assertStringContainsString(
+            'testing '.$excepted.' | GET',
+            $this->file->getContent()
+        );
     }
 
     public function sqlProvider(): array
