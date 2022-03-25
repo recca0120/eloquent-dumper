@@ -25,6 +25,11 @@ abstract class Dumper
     public const MSSQL = 'mssql';
     public const WITHOUT_QUOTE = 'none';
 
+    /**
+     * @var PDO|null
+     */
+    protected $pdo;
+
     private static $drivers = [
         self::DEFAULT => PdoDumper::class,
         self::PDO => PdoDumper::class,
@@ -37,11 +42,6 @@ abstract class Dumper
         self::MSSQL => SqlServerDumper::class,
         self::WITHOUT_QUOTE => WithoutQuoteDumper::class,
     ];
-
-    /**
-     * @var PDO|null
-     */
-    protected $pdo;
 
     /**
      * @param PDO $pdo
@@ -157,6 +157,10 @@ abstract class Dumper
 
         if (is_string($binding) || (is_object($binding) && method_exists($binding, '__toString'))) {
             return $this->parameterize((string) $binding);
+        }
+
+        if (is_numeric($binding)) {
+            return $binding;
         }
 
         if (is_bool($binding)) {

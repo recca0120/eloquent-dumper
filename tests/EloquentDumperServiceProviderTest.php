@@ -12,18 +12,6 @@ class EloquentDumperServiceProviderTest extends TestCase
 {
     private $sqlFile;
 
-    protected function getEnvironmentSetUp($app)
-    {
-        $root = vfsStream::setup();
-        $this->sqlFile = vfsStream::newFile('sql.log')->at($root);
-        $this->slowSqlFile = vfsStream::newFile('slow-sql.log')->at($root);
-
-        $app['config']->set('database.default', 'testing');
-        $app['config']->set('eloquent-dumper.logging.format', '%connection-name% %sql% | %method%');
-        $app['config']->set('eloquent-dumper.logging.channels.log.path', $this->sqlFile->url());
-        $app['config']->set('eloquent-dumper.logging.channels.slow-sql.path', $this->slowSqlFile->url());
-    }
-
     /**
      * @dataProvider sqlProvider
      */
@@ -69,6 +57,18 @@ class EloquentDumperServiceProviderTest extends TestCase
             'select * from [users] where [name] = \'foo\' and [password] = \'bar\'',
             'select * from [users] where [name] = \'foo\' and [password] = \'bar\'',
         ]];
+    }
+
+    protected function getEnvironmentSetUp($app)
+    {
+        $root = vfsStream::setup();
+        $this->sqlFile = vfsStream::newFile('sql.log')->at($root);
+        $this->slowSqlFile = vfsStream::newFile('slow-sql.log')->at($root);
+
+        $app['config']->set('database.default', 'testing');
+        $app['config']->set('eloquent-dumper.logging.format', '%connection-name% %sql% | %method%');
+        $app['config']->set('eloquent-dumper.logging.channels.log.path', $this->sqlFile->url());
+        $app['config']->set('eloquent-dumper.logging.channels.slow-sql.path', $this->slowSqlFile->url());
     }
 
     protected function getPackageProviders($app): array

@@ -87,7 +87,7 @@ class DumperTest extends TestCase
     {
         $dumper = $this->givenDumper();
 
-        $query->from('users')->whereIn('id', [new Expression(1), null, false, 'foo']);
+        $query->from('users')->whereIn('id', [0, new Expression(1), null, false, 'foo']);
 
         $this->assertSql($expected, $dumper, $query);
     }
@@ -96,16 +96,16 @@ class DumperTest extends TestCase
     {
         return [[
             $this->mysql(),
-            'select * from `users` where `id` in (1, NULL, 0, \'foo\')',
+            'select * from `users` where `id` in (0, 1, NULL, 0, \'foo\')',
         ], [
             $this->sqlite(),
-            'select * from "users" where "id" in (1, NULL, 0, \'foo\')',
+            'select * from "users" where "id" in (0, 1, NULL, 0, \'foo\')',
         ], [
             $this->postgres(),
-            'select * from "users" where "id" in (1, NULL, 0, \'foo\')',
+            'select * from "users" where "id" in (0, 1, NULL, 0, \'foo\')',
         ], [
             $this->sqlServer(),
-            'select * from [users] where [id] in (1, NULL, 0, \'foo\')',
+            'select * from [users] where [id] in (0, 1, NULL, 0, \'foo\')',
         ]];
     }
 

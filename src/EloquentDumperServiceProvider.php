@@ -67,7 +67,7 @@ class EloquentDumperServiceProvider extends ServiceProvider
 
         $format = $this->getConfig('logging.format');
 
-        DB::listen(function (QueryExecuted $event) use ($format) {
+        DB::listen(static function (QueryExecuted $event) use ($format) {
             $request = app(Request::class);
             $sql = app(Dumper::class)
                 ->setPdo($event->connection->getPdo())
@@ -85,12 +85,6 @@ class EloquentDumperServiceProvider extends ServiceProvider
         });
     }
 
-    private function registerBuilderMicro($method, Closure $closure): void
-    {
-        Builder::macro($method, $closure);
-        EloquentBuilder::macro($method, $closure);
-    }
-
     public static function formatDuration(float $time): string
     {
         if ($time < 0.001) {
@@ -100,6 +94,12 @@ class EloquentDumperServiceProvider extends ServiceProvider
         return $time < 1
             ? round($time * 1000, 2).'ms'
             : round($time, 2).'s';
+    }
+
+    private function registerBuilderMicro($method, Closure $closure): void
+    {
+        Builder::macro($method, $closure);
+        EloquentBuilder::macro($method, $closure);
     }
 
     /**
