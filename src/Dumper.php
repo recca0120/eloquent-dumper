@@ -3,6 +3,8 @@
 namespace Recca0120\EloquentDumper;
 
 use DateTime;
+use Doctrine\SqlFormatter\Highlighter;
+use Doctrine\SqlFormatter\SqlFormatter;
 use Illuminate\Database\Query\Expression;
 use PDO;
 use Recca0120\EloquentDumper\Dumpers\MySqlDumper;
@@ -73,6 +75,11 @@ abstract class Dumper
         $grammar = $driver !== null && array_key_exists(strtolower($driver), static::$drivers) ? static::$drivers[$driver] : PdoDumper::class;
 
         return new $grammar();
+    }
+
+    public static function format(string $sql, Highlighter $highlighter = null): string
+    {
+        return (new SqlFormatter($highlighter))->format($sql);
     }
 
     /**
