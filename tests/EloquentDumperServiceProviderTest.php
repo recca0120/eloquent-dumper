@@ -38,7 +38,7 @@ class EloquentDumperServiceProviderTest extends TestCase
         self::assertStringContainsString('testing '.$excepted.' | GET', $this->sqlFile->getContent());
     }
 
-    public function sqlProvider(): array
+    public static function sqlProvider(): array
     {
         return [[
             'mysql',
@@ -77,7 +77,7 @@ class EloquentDumperServiceProviderTest extends TestCase
     }
 
     /**
-     * @param string $grammar
+     * @param  string  $grammar
      * @return void
      */
     private function setGrammar(string $grammar): void
@@ -86,7 +86,7 @@ class EloquentDumperServiceProviderTest extends TestCase
     }
 
     /**
-     * @param Builder $query
+     * @param  Builder  $query
      * @return string
      */
     private function dumpSql(Builder $query): string

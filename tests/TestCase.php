@@ -24,74 +24,49 @@ abstract class TestCase extends BaseCase
 {
     use MockeryPHPUnitIntegration;
 
-    /**
-     * @param Builder $query
-     * @return string
-     */
     protected function getDriver(Builder $query): string
     {
         return get_class($query->getGrammar());
     }
 
-    /**
-     * @return Builder
-     */
-    protected function mysql(): Builder
+    protected static function mysql(): Builder
     {
-        return new Builder($this->mockConnection(
+        return new Builder(static::mockConnection(
             new MySqlGrammar(),
             new MySqlProcessor()
         ));
     }
 
-    /**
-     * @return Builder
-     */
-    protected function sqlite(): Builder
+    protected static function sqlite(): Builder
     {
-        return new Builder($this->mockConnection(
+        return new Builder(static::mockConnection(
             new SqliteGrammar(),
             new SqliteProcessor()
         ));
     }
 
-    /**
-     * @return Builder
-     */
-    protected function sqlServer(): Builder
+    protected static function sqlServer(): Builder
     {
-        return new Builder($this->mockConnection(
+        return new Builder(static::mockConnection(
             new SqlServerGrammar(),
             new SqlServerProcessor()
         ));
     }
 
-    /**
-     * @return Builder
-     */
-    protected function postgres(): Builder
+    protected static function postgres(): Builder
     {
-        return new Builder($this->mockConnection(
+        return new Builder(static::mockConnection(
             new PostgresGrammar(),
             new PostgresProcessor()
         ));
     }
 
-    /**
-     * @param string|null $grammar
-     * @return Dumper
-     */
-    protected function givenDumper(?string $grammar = null): Dumper
+    protected function givenDumper(?string $driver = null): Dumper
     {
-        return Dumper::factory($grammar);
+        return Dumper::factory($driver);
     }
 
-    /**
-     * @param Grammar $grammar
-     * @param Processor $processor
-     * @return ConnectionInterface
-     */
-    private function mockConnection(Grammar $grammar, Processor $processor): ConnectionInterface
+    private static function mockConnection(Grammar $grammar, Processor $processor): ConnectionInterface
     {
         $connection = m::mock(Connection::class);
         $connection->allows('getQueryGrammar')->andReturns($grammar);

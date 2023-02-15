@@ -7,7 +7,7 @@ use Recca0120\EloquentDumper\Dumper;
 class PdoDumper extends Dumper
 {
     /**
-     * @param string $sql
+     * @param  string  $sql
      * @return string
      */
     protected function columnize(string $sql): string
@@ -16,7 +16,7 @@ class PdoDumper extends Dumper
     }
 
     /**
-     * @param string $value
+     * @param  string  $value
      * @return string
      */
     protected function parameterize(string $value): string

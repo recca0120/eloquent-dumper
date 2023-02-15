@@ -121,7 +121,7 @@ class EloquentDumperServiceProvider extends ServiceProvider
     }
 
     /**
-     * @param string $name
+     * @param  string  $name
      * @return mixed
      */
     private function getConfig(string $name)
