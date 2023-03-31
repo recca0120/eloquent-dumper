@@ -12,9 +12,6 @@ class DumperTest extends TestCase
 {
     /**
      * @dataProvider simpleProvider
-     *
-     * @param  Builder  $query
-     * @param  string  $expected
      */
     public function test_it_should_get_simple_sql(Builder $query, string $expected): void
     {
@@ -46,9 +43,6 @@ class DumperTest extends TestCase
 
     /**
      * @dataProvider whereRawProvider
-     *
-     * @param  Builder  $query
-     * @param  string  $expected
      */
     public function test_it_should_get_where_raw_sql(Builder $query, string $expected): void
     {
@@ -94,9 +88,6 @@ class DumperTest extends TestCase
 
     /**
      * @dataProvider inProvider
-     *
-     * @param  Builder  $query
-     * @param  string  $expected
      */
     public function test_it_should_get_condition_in_sql(Builder $query, string $expected): void
     {
@@ -126,9 +117,6 @@ class DumperTest extends TestCase
 
     /**
      * @dataProvider withoutQuoteGrammarProvider
-     *
-     * @param  Builder  $query
-     * @param  string  $expected
      */
     public function test_it_should_convert_to_without_quote_sql(Builder $query, string $expected): void
     {
@@ -158,9 +146,6 @@ class DumperTest extends TestCase
 
     /**
      * @dataProvider mySQLGrammarProvider
-     *
-     * @param  Builder  $query
-     * @param  string  $expected
      */
     public function test_it_should_convert_to_mysql_version_sql(Builder $query, string $expected): void
     {
@@ -190,9 +175,6 @@ class DumperTest extends TestCase
 
     /**
      * @dataProvider sqliteGrammarProvider
-     *
-     * @param  Builder  $query
-     * @param  string  $expected
      */
     public function test_it_should_convert_to_sqlite_version_sql(Builder $query, string $expected): void
     {
@@ -222,9 +204,6 @@ class DumperTest extends TestCase
 
     /**
      * @dataProvider postgresGrammarProvider
-     *
-     * @param  Builder  $query
-     * @param  string  $expected
      */
     public function test_it_should_convert_to_postgres_version_sql(Builder $query, string $expected): void
     {
@@ -254,9 +233,6 @@ class DumperTest extends TestCase
 
     /**
      * @dataProvider sqlServerGrammarProvider
-     *
-     * @param  Builder  $query
-     * @param  string  $expected
      */
     public function test_it_should_convert_to_sqlserver_version_sql(Builder $query, string $expected): void
     {
@@ -284,11 +260,6 @@ class DumperTest extends TestCase
         ]];
     }
 
-    /**
-     * @param  string  $expected
-     * @param  Dumper  $dumper
-     * @param  Builder  $query
-     */
     private function assertSql(string $expected, Dumper $dumper, Builder $query): void
     {
         self::assertEquals(

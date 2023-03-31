@@ -87,19 +87,13 @@ abstract class Dumper
 
     abstract protected function columnize(string $sql): string;
 
-    /**
-     * @param  string  $value
-     * @return string
-     */
     protected function parameterize(string $value): string
     {
         return $this->quoteString($this->escape($value));
     }
 
     /**
-     * @param  string  $sql
      * @param  string[]  $columnQuotedIdentifiers
-     * @return string
      */
     protected function replaceColumnQuotedIdentifiers(string $sql, array $columnQuotedIdentifiers): string
     {

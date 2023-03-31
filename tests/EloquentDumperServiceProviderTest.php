@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Orchestra\Testbench\TestCase;
 use org\bovigo\vfs\vfsStream;
 use Recca0120\EloquentDumper\EloquentDumperServiceProvider;
+use Recca0120\EloquentDumper\Output\ConsoleOutput;
 
 class EloquentDumperServiceProviderTest extends TestCase
 {
@@ -17,6 +18,9 @@ class EloquentDumperServiceProviderTest extends TestCase
      */
     public function test_dump_sql(string $grammar, string $excepted, string $exceptedOutput): void
     {
+        ConsoleOutput::setEchoFunction(static function ($sql) {
+            echo $sql;
+        });
         $this->setGrammar($grammar);
         $query = User::where('name', 'foo')->where('password', 'bar');
         $sql = $query->toRawSql();
@@ -40,23 +44,25 @@ class EloquentDumperServiceProviderTest extends TestCase
 
     public static function sqlProvider(): array
     {
-        return [[
-            'mysql',
-            'select * from `users` where `name` = \'foo\' and `password` = \'bar\'',
-            'select * from `users` where `name` = \'foo\' and `password` = \'bar\'',
-        ], [
-            'sqlite',
-            'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
-            'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
-        ], [
-            'pgsql',
-            'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
-            'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
-        ], [
-            'sqlsrv',
-            'select * from [users] where [name] = \'foo\' and [password] = \'bar\'',
-            'select * from [users] where [name] = \'foo\' and [password] = \'bar\'',
-        ]];
+        return [
+            [
+                'mysql',
+                'select * from `users` where `name` = \'foo\' and `password` = \'bar\'',
+                'select * from `users` where `name` = \'foo\' and `password` = \'bar\'',
+            ], [
+                'sqlite',
+                'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
+                'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
+            ], [
+                'pgsql',
+                'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
+                'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
+            ], [
+                'sqlsrv',
+                'select * from [users] where [name] = \'foo\' and [password] = \'bar\'',
+                'select * from [users] where [name] = \'foo\' and [password] = \'bar\'',
+            ],
+        ];
     }
 
     protected function getEnvironmentSetUp($app)
@@ -76,19 +82,11 @@ class EloquentDumperServiceProviderTest extends TestCase
         return [EloquentDumperServiceProvider::class];
     }
 
-    /**
-     * @param  string  $grammar
-     * @return void
-     */
     private function setGrammar(string $grammar): void
     {
         $this->app['config']->set('eloquent-dumper.grammar', $grammar);
     }
 
-    /**
-     * @param  Builder  $query
-     * @return string
-     */
     private function dumpSql(Builder $query): string
     {
         ob_start();
