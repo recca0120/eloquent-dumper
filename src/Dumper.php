@@ -75,7 +75,7 @@ abstract class Dumper
         return new $grammar();
     }
 
-    public static function format(string $sql, Highlighter $highlighter = null): string
+    public static function format(string $sql, ?Highlighter $highlighter = null): string
     {
         return (new SqlFormatter($highlighter))->format($sql);
     }

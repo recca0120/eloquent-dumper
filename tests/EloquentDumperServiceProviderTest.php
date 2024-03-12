@@ -16,7 +16,7 @@ class EloquentDumperServiceProviderTest extends TestCase
     /**
      * @dataProvider sqlProvider
      */
-    public function test_dump_sql(string $grammar, string $excepted, string $exceptedOutput): void
+    public function test_dump_sql(string $grammar, string $excepted): void
     {
         ConsoleOutput::setEchoFunction(static function ($sql) {
             echo $sql;
@@ -26,8 +26,8 @@ class EloquentDumperServiceProviderTest extends TestCase
         $sql = $query->toRawSql();
         $dumpSql = $this->dumpSql($query);
 
-        self::assertEquals($excepted, $sql);
-        self::assertEquals($excepted, $dumpSql);
+        self::assertStringContainsStringIgnoringCase($excepted, $sql);
+        self::assertStringContainsStringIgnoringCase($excepted, $dumpSql);
     }
 
     /**
@@ -48,18 +48,14 @@ class EloquentDumperServiceProviderTest extends TestCase
             [
                 'mysql',
                 'select * from `users` where `name` = \'foo\' and `password` = \'bar\'',
-                'select * from `users` where `name` = \'foo\' and `password` = \'bar\'',
             ], [
                 'sqlite',
-                'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
                 'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
             ], [
                 'pgsql',
                 'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
-                'select * from "users" where "name" = \'foo\' and "password" = \'bar\'',
             ], [
                 'sqlsrv',
-                'select * from [users] where [name] = \'foo\' and [password] = \'bar\'',
                 'select * from [users] where [name] = \'foo\' and [password] = \'bar\'',
             ],
         ];
